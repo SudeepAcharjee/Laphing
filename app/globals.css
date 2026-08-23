@@ -1,0 +1,115 @@
+@import "tailwindcss";
+
+:root {
+  --background: #000000;
+  --foreground: #ffffff;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-inter);
+  --font-anton: var(--font-anton);
+  --font-bebas: var(--font-bebas);
+  --animate-mascot-in: mascot-in 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-laugh: laugh 2s ease-in-out infinite;
+  --animate-hero-entrance: hero-entrance 1.5s cubic-bezier(0.2, 1, 0.3, 1) both;
+  --animate-hero-float: hero-float 8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  --animate-run-bounce: run-bounce 0.4s ease-in-out infinite;
+  --animate-swing: swing 1.5s ease-in-out infinite;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #000000;
+    --foreground: #ffffff;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter), Arial, Helvetica, sans-serif;
+}
+
+@keyframes mascot-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) translateY(40px) rotate(-10deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0) rotate(0deg);
+  }
+}
+
+@keyframes hero-entrance {
+  0% {
+    opacity: 0;
+    transform: scale(0.7) rotate(-8deg) translateX(100px);
+    filter: blur(10px);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.05) rotate(2deg) translateX(-10px);
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg) translateX(0);
+    filter: blur(0px);
+  }
+}
+
+@keyframes hero-float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  25% {
+    transform: translateY(-25px) rotate(3deg) scale(1.02);
+  }
+  50% {
+    transform: translateY(-10px) rotate(-1deg) scale(0.98);
+  }
+  75% {
+    transform: translateY(-30px) rotate(2deg) scale(1.03);
+  }
+}
+
+@keyframes laugh {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+  }
+  25% {
+    transform: scale(1.05, 0.95) rotate(-3deg);
+  }
+  50% {
+    transform: scale(0.95, 1.05) rotate(3deg);
+  }
+  75% {
+    transform: scale(1.05, 0.95) rotate(-3deg);
+  }
+}
+
+@keyframes run-bounce {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-15px) rotate(5deg); }
+  75% { transform: translateY(-10px) rotate(-5deg); }
+}
+
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes swing {
+  0%, 100% { transform: rotate(-5deg); }
+  50% { transform: rotate(5deg); }
+}
