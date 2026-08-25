@@ -19,10 +19,10 @@ export default function Navbar() {
         {/* Action Buttons & Cart */}
         <div className="flex items-center gap-4 md:gap-6 shrink-0">
           <div className="hidden md:flex items-center gap-3">
-            <button className="text-[#FFDE59] border-2 border-[#FFDE59] hover:bg-[#FFDE59] hover:text-black transition-all duration-300 font-bold tracking-widest text-[12px] px-5 py-1.5 rounded-full">
+            <button className="text-[#FFDE59] border-2 border-[#FFDE59] hover:bg-[#FFDE59] hover:text-black transition-all duration-300 font-bold tracking-widest text-[12px] px-5 py-1.5 rounded-full cursor-pointer">
               REFER
             </button>
-            <button className="bg-[#FFDE59] text-black px-5 py-2 rounded-full text-[12px] font-bold tracking-widest hover:bg-[#e5c750] transition-colors">
+            <button className="bg-[#FFDE59] text-black px-5 py-2 rounded-full text-[12px] font-bold tracking-widest hover:bg-[#e5c750] transition-colors cursor-pointer">
               SIGN UP
             </button>
           </div>

@@ -20,7 +20,7 @@ const bebas = Bebas_Neue({
 });
 
 export const metadata: Metadata = {
-  title: "The Lancing Co.",
+  title: "The Laphing Co.",
   description: "Delicious Laphing ready in 7 minutes",
 };
 
@@ -34,7 +34,7 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${anton.variable} ${bebas.variable} min-h-screen antialiased`}
     >
-      <body className="min-h-screen flex flex-col bg-[#270606] text-white">
+      <body className="min-h-screen flex flex-col bg-black text-white">
         {children}
       </body>
     </html>
