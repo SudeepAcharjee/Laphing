@@ -25,13 +25,26 @@ export default function Home() {
   const ingredientsPanelRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
   const lineRefs = useRef<(SVGPathElement | null)[]>([]);
+  const dotRefs = useRef<(SVGCircleElement | null)[]>([]);
   const spineClipRef = useRef<SVGRectElement>(null);
+  const packageFloatRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
 
     const ctx = gsap.context(() => {
       if (!masterTrackRef.current || !packageRef.current || !heroTextRef.current) return;
+
+      if (packageFloatRef.current) {
+        gsap.to(packageFloatRef.current, {
+          y: -15,
+          rotation: 1.5,
+          duration: 3.5,
+          yoyo: true,
+          repeat: -1,
+          ease: "sine.inOut",
+        });
+      }
 
       const mm = gsap.matchMedia();
 
@@ -54,6 +67,9 @@ export default function Home() {
           if (line) {
             const length = line.getTotalLength ? line.getTotalLength() : 110;
             gsap.set(line, { strokeDasharray: length, strokeDashoffset: length });
+          }
+          if (dotRefs.current[index]) {
+            gsap.set(dotRefs.current[index], { opacity: 0 });
           }
         });
 
@@ -97,7 +113,7 @@ export default function Home() {
           masterTl.to(
             spineClipRef.current,
             {
-              attr: { height: 440 },
+              attr: { height: 600 },
               duration: 0.65,
               ease: "none",
             },
@@ -136,6 +152,14 @@ export default function Home() {
               startTime
             );
           }
+
+          if (dotRefs.current[index]) {
+            masterTl.to(
+              dotRefs.current[index],
+              { opacity: 1, duration: 0.05 },
+              startTime
+            );
+          }
         });
 
         masterTl.to({}, { duration: 0.1 });
@@ -159,6 +183,9 @@ export default function Home() {
           if (line) {
             const length = line.getTotalLength ? line.getTotalLength() : 80;
             gsap.set(line, { strokeDasharray: length, strokeDashoffset: length });
+          }
+          if (dotRefs.current[index]) {
+            gsap.set(dotRefs.current[index], { opacity: 0 });
           }
         });
 
@@ -193,6 +220,18 @@ export default function Home() {
             duration: 0.12,
           }, 0.25);
 
+        if (spineClipRef.current) {
+          masterTl.to(
+            spineClipRef.current,
+            {
+              attr: { height: 600 },
+              duration: 0.65,
+              ease: "none",
+            },
+            0.28
+          );
+        }
+
         // Step 2: Reveal the 6 ingredients on mobile with arrows
         ingredients.forEach((_, index) => {
           const item = itemRefs.current[index];
@@ -221,6 +260,14 @@ export default function Home() {
                 duration: 0.08,
                 ease: "power2.out",
               },
+              startTime
+            );
+          }
+
+          if (dotRefs.current[index]) {
+            masterTl.to(
+              dotRefs.current[index],
+              { opacity: 1, duration: 0.05 },
               startTime
             );
           }
@@ -273,16 +320,16 @@ export default function Home() {
               fill
               priority
               quality={90}
-              className="object-cover object-center"
+              className="object-cover object-center opacity-80"
             />
-            {/* Black overlay for contrast and rich mood */}
-            <div className="absolute inset-0 bg-black/55" />
+            {/* Smooth, premium gradient overlay for perfect contrast */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-[#050300] mix-blend-multiply" />
           </div>
 
           <div className="relative w-full max-w-[1140px] xl:max-w-[1180px] mx-auto h-full flex items-center justify-between gap-2 sm:gap-4 md:gap-8 lg:gap-12">
             
             {/* ================= LEFT COLUMN: Hero Text (Top) -> Product Package Lands Here on Scroll ================= */}
-            <div className="relative w-[40%] sm:w-[42%] lg:w-[45%] xl:w-[44%] h-full flex items-center justify-start z-20">
+            <div className="relative w-[45%] sm:w-[48%] lg:w-[50%] xl:w-[52%] h-full flex items-center justify-start z-20">
               
               {/* Hero Left Content (Visible at top, fades out on scroll) */}
               <div 
@@ -290,34 +337,35 @@ export default function Home() {
                 className="flex flex-col items-start text-left z-20 shrink-0 w-full"
               >
                 {/* Tagline */}
-                <div className="mb-1.5 sm:mb-2 md:mb-3 animate-[fade-in-up_0.8s_ease-out_2.6s_both]">
-                  <span className="text-[#FFAE00] font-inter font-bold tracking-[0.16em] sm:tracking-[0.2em] text-[11px] sm:text-[13px] md:text-[15px] uppercase">
+                <div className="mb-3 sm:mb-4 md:mb-5 animate-[fade-in-up_0.8s_ease-out_2.6s_both]">
+                  <span className="text-[#FFAE00] font-inter font-semibold tracking-[0.25em] text-[10px] sm:text-[12px] md:text-[14px] uppercase">
                     SPICY. TANGY. ADDICTIVE.
                   </span>
                 </div>
 
                 {/* Main Headline */}
-                <h1 className="font-bebas text-[42px] sm:text-[56px] md:text-[76px] lg:text-[96px] xl:text-[120px] leading-[0.88] tracking-[0.03em] uppercase mb-2 sm:mb-3 md:mb-4 animate-[fade-in-up_0.8s_ease-out_2.8s_both]">
+                <h1 className="font-bebas text-[48px] sm:text-[68px] md:text-[92px] lg:text-[112px] xl:text-[136px] leading-[0.85] tracking-[0.03em] uppercase mb-4 sm:mb-6 md:mb-8 animate-[fade-in-up_0.8s_ease-out_2.8s_both]">
                   <span className="text-white block">LOVE.</span>
                   <span className="text-[#FFAE00] block">LAPH.</span>
                   <span className="text-white block">CHEAT.</span>
                 </h1>
                 
                 {/* Subtitle */}
-                <p className="text-white/70 font-inter text-[12px] sm:text-[14px] md:text-[16px] leading-tight sm:leading-snug font-normal mb-4 sm:mb-5 md:mb-6 animate-[fade-in-up_0.8s_ease-out_3.0s_both]">
-                  Not just a snack,<br />
-                  it’s a whole vibe.
+                <p className="text-white/60 font-inter text-[14px] sm:text-[16px] md:text-[18px] leading-relaxed font-light mb-8 sm:mb-10 md:mb-12 animate-[fade-in-up_0.8s_ease-out_3.0s_both] max-w-[100%] sm:max-w-[95%] pr-4">
+                  Not just a snack, it’s a whole <span className="text-white font-medium">vibe</span>.<br />
+                  Get ready for the boldest flavours in every bite.
                 </p>
                 
-                {/* CTA Button with Mascot */}
-                <div className="flex items-center gap-3 sm:gap-4 animate-[fade-in-up_0.8s_ease-out_3.2s_both] relative">
-                  <div className="absolute -top-[28px] left-[105px] sm:-top-[34px] sm:left-[125px] md:-top-[42px] md:left-[140px] w-[38px] h-[38px] sm:w-[48px] sm:h-[48px] md:w-[56px] md:h-[56px] z-10 animate-swing origin-bottom cursor-pointer hover:animate-laugh transition-transform">
-                    <Image src="/sitting.svg" alt="Sitting Mascot" fill className="object-contain drop-shadow-[0_4px_10px_rgba(255,174,0,0.3)] pointer-events-none" />
+                {/* CTA Button */}
+                <div className="flex items-center gap-3 sm:gap-4 animate-[fade-in-up_0.8s_ease-out_3.2s_both] relative group">
+                  {/* Clean mascot, no bouncy animations */}
+                  <div className="absolute -top-[30px] left-[170px] sm:-top-[38px] sm:left-[200px] md:-top-[42px] md:left-[240px] w-[36px] h-[36px] sm:w-[48px] sm:h-[48px] md:w-[56px] md:h-[56px] z-10 origin-bottom pointer-events-none transition-transform duration-500 group-hover:-translate-y-2">
+                    <Image src="/sitting.svg" alt="Sitting Mascot" fill className="object-contain" />
                   </div>
 
-                  <button className="bg-[#FFAE00] hover:bg-[#ffb91a] text-black px-5 py-2.5 sm:px-7 sm:py-3 md:px-8 md:py-3.5 rounded-full font-extrabold text-[11px] sm:text-[13px] md:text-[14px] tracking-wider uppercase flex items-center gap-1.5 sm:gap-2 transition-all shadow-[0_0_20px_rgba(255,174,0,0.25)] hover:scale-[1.02] active:scale-[0.98] cursor-pointer">
+                  <button className="bg-[#FFAE00] hover:bg-white text-black px-8 py-3.5 sm:px-10 sm:py-4 md:px-12 md:py-5 rounded-full font-bold font-inter text-[12px] sm:text-[14px] md:text-[15px] tracking-[0.05em] uppercase flex items-center gap-3 transition-colors duration-300 shadow-[0_10px_40px_-10px_rgba(255,174,0,0.5)] hover:shadow-[0_10px_40px_-10px_rgba(255,255,255,0.5)]">
                     <span>Join Waitlist</span>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 transition-transform group-hover:translate-x-1">
                       <path d="M5 12h14"></path>
                       <path d="M13 5l7 7-7 7"></path>
                     </svg>
@@ -337,8 +385,11 @@ export default function Home() {
             </div>
 
             {/* ================= RIGHT COLUMN: Hero Package (Starts Here) -> 6 Ingredients Reveal Here ================= */}
-            <div className="relative w-[60%] sm:w-[58%] lg:w-[55%] xl:w-[56%] h-full flex items-center justify-end z-30">
+            <div className="relative w-[55%] sm:w-[52%] lg:w-[50%] xl:w-[48%] h-full flex items-center justify-end z-30">
               
+              {/* Subtle ambient glow behind the product */}
+              <div className="absolute right-[10%] top-1/2 -translate-y-1/2 w-[250px] sm:w-[350px] lg:w-[500px] h-[250px] sm:h-[350px] lg:h-[500px] rounded-full bg-[#FFAE00]/10 blur-[100px] lg:blur-[150px] pointer-events-none mix-blend-screen" />
+
               {/* Product Package Start Slot */}
               <div 
                 ref={heroSlotRef} 
@@ -351,14 +402,17 @@ export default function Home() {
                   className="relative w-full h-full flex justify-center items-center pointer-events-auto will-change-transform z-30"
                 >
                   <div className="relative w-full h-full animate-hero-entrance">
-                    <Image 
-                      src="/hero.png" 
-                      alt="The Laphing Co Product Package" 
-                      fill
-                      sizes="(max-width: 640px) 170px, (max-width: 1024px) 320px, 460px" 
-                      className="object-contain drop-shadow-[0_0_60px_rgba(255,174,0,0.25)]" 
-                      priority 
-                    />
+                    {/* Inner wrapper for continuous floating animation */}
+                    <div ref={packageFloatRef} className="w-full h-full relative">
+                      <Image 
+                        src="/hero.png" 
+                        alt="The Laphing Co Product Package" 
+                        fill
+                        sizes="(max-width: 640px) 170px, (max-width: 1024px) 320px, 460px" 
+                        className="object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.7)]" 
+                        priority 
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -366,159 +420,108 @@ export default function Home() {
               {/* Right: The 6 Ingredients Stack & Curved Pointer Flow */}
               <div 
                 ref={ingredientsPanelRef}
-                className="relative w-full z-20 flex flex-col gap-1.5 sm:gap-2.5 md:gap-3.5 lg:gap-4.5 opacity-0 transition-opacity duration-300 items-start pl-1 sm:pl-3 md:pl-4 lg:pl-6"
+                className="relative w-full max-w-[260px] sm:max-w-[300px] md:max-w-[380px] lg:max-w-[460px] xl:max-w-[500px] aspect-[5/6] opacity-0 transition-opacity duration-300"
               >
-                {/* Curved Vertical Dotted Spine passing through the 6 nodes */}
-                <div className="hidden sm:block absolute left-0 top-[15px] sm:top-[20px] bottom-[15px] sm:bottom-[20px] w-[50px] lg:w-[90px] pointer-events-none z-10">
-                  <svg className="w-full h-full overflow-visible" viewBox="0 0 90 420" preserveAspectRatio="none" fill="none">
-                    <defs>
-                      <clipPath id="spine-draw-clip">
-                        <rect ref={spineClipRef} x="-20" y="0" width="130" height="0" />
-                      </clipPath>
-                    </defs>
-                    <path 
-                      d="M 6 25 C 45 95, 75 165, 75 210 C 75 255, 45 325, 6 395" 
-                      stroke="#FFAE00" 
-                      strokeWidth="1.8" 
-                      strokeDasharray="4 6" 
-                      opacity="0.8"
-                      clipPath="url(#spine-draw-clip)"
-                    />
-                  </svg>
-                </div>
+                {/* Unified SVG containing the animated spine curve and 6 straight arrows */}
+                <svg className="absolute inset-0 w-full h-full overflow-visible pointer-events-none z-10" viewBox="0 0 500 600" fill="none">
+                  <defs>
+                    <clipPath id="spine-draw-clip">
+                      <rect ref={spineClipRef} x="0" y="0" width="200" height="0" />
+                    </clipPath>
+                    <marker
+                      id="arrowhead"
+                      markerWidth="5"
+                      markerHeight="5"
+                      refX="4"
+                      refY="2.5"
+                      orient="auto"
+                    >
+                      <polygon points="0 0, 5 2.5, 0 5" fill="#FFAE00" />
+                    </marker>
+                  </defs>
 
+                  {/* Elegant, crisp spine arc */}
+                  <path 
+                    d="M 40 50 Q 160 300 40 550" 
+                    stroke="#FFAE00" 
+                    strokeWidth="1.5" 
+                    strokeDasharray="4 6" 
+                    strokeLinecap="round"
+                    opacity="0.3"
+                    clipPath="url(#spine-draw-clip)"
+                  />
+
+                  {ingredients.map((item, index) => {
+                    // Exact intersection points on the quadratic bezier spine
+                    const yCoords = [50, 150, 250, 350, 450, 550];
+                    const xCoords = [40, 78, 98, 98, 78, 40];
+                    const targetX = 160;
+                    const Y = yCoords[index];
+                    const X = xCoords[index];
+
+                    return (
+                      <g key={`svg-${item.id}`}>
+                        {/* Crisp Straight Animated Arrow */}
+                        <path 
+                          ref={(el) => { lineRefs.current[index] = el; }}
+                          d={`M ${X} ${Y} L ${targetX} ${Y}`}
+                          stroke="#FFAE00" 
+                          strokeWidth="1.5" 
+                          opacity="0.7"
+                          markerEnd="url(#arrowhead)"
+                        />
+                        {/* Minimal Node Dot */}
+                        <circle 
+                          ref={(el) => { dotRefs.current[index] = el; }}
+                          cx={X} cy={Y} r="3.5" 
+                          fill="#FFAE00" 
+                        />
+                      </g>
+                    );
+                  })}
+                </svg>
+
+                {/* HTML Overlays accurately positioned relative to the SVG ViewBox */}
                 {ingredients.map((item, index) => {
-                  // Margin offsets creating the prominent curve for arrows, pouches, and text together
-                  const arcMarginClasses = [
-                    "ml-0 lg:ml-0",
-                    "ml-1 sm:ml-3 md:ml-5 lg:ml-8",
-                    "ml-2 sm:ml-5 md:ml-10 lg:ml-16",
-                    "ml-2 sm:ml-5 md:ml-10 lg:ml-16",
-                    "ml-1 sm:ml-3 md:ml-5 lg:ml-8",
-                    "ml-0 lg:ml-0",
-                  ];
-
-                  // Precise curve geometries for the arrows (responsive widths)
-                  const arrowConfigs = [
-                    {
-                      widthClass: "w-[28px] sm:w-[50px] md:w-[85px] lg:w-[135px]",
-                      viewBox: "0 0 135 44",
-                      nodeX: 6,
-                      nodeY: 36,
-                      d: "M 6 36 C 45 36, 85 14, 122 14",
-                    },
-                    {
-                      widthClass: "w-[26px] sm:w-[48px] md:w-[80px] lg:w-[130px]",
-                      viewBox: "0 0 130 36",
-                      nodeX: 6,
-                      nodeY: 26,
-                      d: "M 6 26 C 45 26, 80 16, 118 16",
-                    },
-                    {
-                      widthClass: "w-[24px] sm:w-[45px] md:w-[75px] lg:w-[125px]",
-                      viewBox: "0 0 125 28",
-                      nodeX: 6,
-                      nodeY: 14,
-                      d: "M 6 14 L 114 14",
-                    },
-                    {
-                      widthClass: "w-[24px] sm:w-[45px] md:w-[75px] lg:w-[125px]",
-                      viewBox: "0 0 125 28",
-                      nodeX: 6,
-                      nodeY: 14,
-                      d: "M 6 14 L 114 14",
-                    },
-                    {
-                      widthClass: "w-[26px] sm:w-[48px] md:w-[80px] lg:w-[130px]",
-                      viewBox: "0 0 130 36",
-                      nodeX: 6,
-                      nodeY: 10,
-                      d: "M 6 10 C 45 10, 80 20, 118 20",
-                    },
-                    {
-                      widthClass: "w-[28px] sm:w-[50px] md:w-[85px] lg:w-[135px]",
-                      viewBox: "0 0 135 44",
-                      nodeX: 6,
-                      nodeY: 8,
-                      d: "M 6 8 C 45 8, 85 30, 122 30",
-                    },
-                  ];
-
-                  const arrow = arrowConfigs[index] || arrowConfigs[0];
-                  const currentMargin = arcMarginClasses[index] || "";
+                  const yCoords = [50, 150, 250, 350, 450, 550];
+                  const topPercent = (yCoords[index] / 600) * 100;
+                  const leftPercent = (175 / 500) * 100; // Leaves 15px gap from arrow tip
+                  const widthPercent = ((500 - 175) / 500) * 100;
 
                   return (
                     <div 
                       key={item.id}
-                      ref={(el) => { itemRefs.current[index] = el; }}
-                      className={`relative flex items-center gap-1.5 sm:gap-2.5 md:gap-3 lg:gap-4 group transition-all duration-300 ${currentMargin}`}
+                      className="absolute z-20"
+                      style={{ 
+                        top: `${topPercent}%`, 
+                        left: `${leftPercent}%`,
+                        transform: 'translateY(-50%)',
+                        width: `${widthPercent}%`
+                      }}
                     >
-                      {/* Curving SVG Arrow with Yellow Node and Seamless Arrowhead */}
+                      {/* Clean inner wrapper */}
                       <div 
-                        className={`relative h-[24px] sm:h-[30px] md:h-[36px] lg:h-[40px] shrink-0 pointer-events-none ${arrow.widthClass}`}
-                        style={{ minWidth: "28px" }}
+                        ref={(el) => { itemRefs.current[index] = el; }}
+                        className="flex items-center gap-4 sm:gap-5 md:gap-6 cursor-pointer group hover:translate-x-2 transition-transform duration-500 ease-out py-2"
                       >
-                        <svg 
-                          className="w-full h-full overflow-visible" 
-                          viewBox={arrow.viewBox} 
-                          fill="none"
-                        >
-                          <defs>
-                            <marker
-                              id={`arrow-${item.id}`}
-                              markerWidth="7"
-                              markerHeight="7"
-                              refX="4.5"
-                              refY="3.5"
-                              orient="auto"
-                            >
-                              <polygon points="0 1, 6 3.5, 0 6" fill="#FFAE00" />
-                            </marker>
-                          </defs>
-
-                          {/* Animated Arrow Path with attached marker arrowhead */}
-                          <path 
-                            ref={(el) => { lineRefs.current[index] = el; }}
-                            d={arrow.d}
-                            stroke="#FFAE00" 
-                            strokeWidth="2" 
-                            strokeLinecap="round"
-                            markerEnd={`url(#arrow-${item.id})`}
-                          />
-
-                          {/* Left Glowing Node dot */}
-                          <circle 
-                            cx={arrow.nodeX} 
-                            cy={arrow.nodeY} 
-                            r="4.5" 
-                            fill="#FFAE00" 
-                            className="drop-shadow-[0_0_8px_rgba(255,174,0,1)]" 
-                          />
-                        </svg>
-                      </div>
-
-                      {/* Ingredient Item: Floating Pouch + Bold Yellow Title */}
-                      <div className="flex items-center gap-2 sm:gap-3 md:gap-4 lg:gap-5 cursor-pointer group-hover:translate-x-1 transition-transform duration-300">
-                        {/* Pouch Image */}
-                        <div className="relative w-[34px] h-[34px] sm:w-[44px] sm:h-[44px] md:w-[54px] md:h-[54px] lg:w-[68px] lg:h-[68px] shrink-0 flex items-center justify-center">
+                        {/* Pouch Image - natural realistic shadow */}
+                        <div className="relative w-[36px] h-[36px] sm:w-[48px] sm:h-[48px] md:w-[60px] md:h-[60px] lg:w-[72px] lg:h-[72px] shrink-0 flex items-center justify-center z-10 transition-transform duration-500 ease-out group-hover:scale-110">
                           <Image 
                             src={item.image} 
                             alt={item.alt} 
                             fill 
-                            sizes="(max-width: 640px) 34px, (max-width: 1024px) 54px, 68px"
-                            className="object-contain drop-shadow-[0_4px_14px_rgba(255,174,0,0.3)] group-hover:scale-110 transition-transform duration-300" 
+                            sizes="(max-width: 640px) 36px, (max-width: 1024px) 60px, 72px"
+                            className="object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)]" 
                           />
                         </div>
 
-                        {/* Title with Subtle Underline */}
-                        <div className="flex flex-col items-start min-w-0">
-                          <span className="font-bebas text-[13px] sm:text-[17px] md:text-[22px] lg:text-[26px] tracking-[0.04em] text-[#FFAE00] uppercase font-bold leading-none group-hover:text-white transition-colors duration-200 truncate">
+                        {/* Minimal Text Content */}
+                        <div className="flex flex-col items-start min-w-0 z-10 relative">
+                          <span className="font-bebas text-[16px] sm:text-[20px] md:text-[26px] lg:text-[32px] tracking-[0.05em] text-white/60 uppercase font-medium leading-none group-hover:text-white transition-colors duration-300 truncate">
                             {item.name}
                           </span>
-                          <div className="w-full h-[1px] bg-gradient-to-r from-[#FFAE00]/40 via-[#FFAE00]/20 to-transparent mt-0.5 sm:mt-1" />
                         </div>
                       </div>
-
                     </div>
                   );
                 })}
@@ -531,18 +534,22 @@ export default function Home() {
       </div>
 
       {/* ================= PAGE 3: BOTTOM CTA SECTION ================= */}
-      <section className="relative w-full py-24 px-8 flex flex-col items-center justify-center text-center border-t border-white/10 bg-gradient-to-b from-black to-[#0a0702] z-20">
-        <div className="max-w-[700px] flex flex-col items-center">
-          <span className="text-[#FFAE00] font-inter font-bold tracking-[0.2em] text-[12px] md:text-[13px] uppercase mb-3">
+      <section className="relative w-full py-32 sm:py-40 px-6 sm:px-8 flex flex-col items-center justify-center text-center border-t border-white/5 bg-[#050300] z-20 overflow-hidden">
+        
+        {/* Soft, minimal ambient glow */}
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[80%] max-w-[800px] h-[400px] bg-[#FFAE00]/5 blur-[150px] rounded-t-full pointer-events-none" />
+
+        <div className="max-w-[800px] flex flex-col items-center relative z-10">
+          <span className="text-[#FFAE00] font-inter font-semibold tracking-[0.3em] text-[10px] md:text-[12px] uppercase mb-6">
             READY IN 7 MINUTES
           </span>
-          <h2 className="font-bebas text-[48px] sm:text-[64px] md:text-[80px] leading-[0.9] tracking-tight uppercase text-white mb-6">
+          <h2 className="font-bebas text-[56px] sm:text-[76px] md:text-[104px] leading-[0.85] tracking-tight uppercase text-white mb-10">
             CRAVING SATISFACTION, <br />
             <span className="text-[#FFAE00]">DELIVERED.</span>
           </h2>
-          <button className="bg-[#FFAE00] hover:bg-[#ffb91a] text-black px-10 py-4 rounded-full font-extrabold text-[14px] tracking-wider uppercase flex items-center gap-2 transition-all shadow-[0_0_25px_rgba(255,174,0,0.3)] hover:scale-105 active:scale-95 cursor-pointer">
-            Order Your Pack Now
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <button className="bg-[#FFAE00] hover:bg-white text-black px-10 py-4 sm:px-12 sm:py-5 rounded-full font-bold font-inter text-[13px] sm:text-[15px] tracking-[0.05em] uppercase flex items-center gap-3 transition-colors duration-300 shadow-[0_10px_40px_-10px_rgba(255,174,0,0.5)] hover:shadow-[0_10px_40px_-10px_rgba(255,255,255,0.5)]">
+            <span>Order Your Pack Now</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="transition-transform group-hover:translate-x-1.5">
               <path d="M5 12h14"></path>
               <path d="M13 5l7 7-7 7"></path>
             </svg>
