@@ -1,75 +1,91 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
+import { Gift, ShoppingBag, User as UserIcon } from "lucide-react";
 
 export default function Navbar() {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { user, userData, openAuthModal, openReferModal } = useAuth();
+
+  const displayName = userData?.name || user?.displayName || user?.email?.split("@")[0] || "VIP";
 
   return (
-    <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[95%] md:w-[90%] max-w-[1000px] animate-[fade-in-up_0.8s_ease-out_2.5s_both]">
-      <nav className="relative flex items-center justify-between px-4 md:px-6 py-2.5 bg-[#111111]/90 backdrop-blur-md rounded-full border border-[#FFDE59]/20 shadow-[0_0_30px_rgba(255,222,89,0.05)]">
+    <header className="w-full bg-[#741117] border-b border-black/10 z-50 select-none shrink-0 transition-all duration-300 shadow-md">
+      <div className="w-full px-4 sm:px-8 md:px-12 h-[56px] sm:h-[64px] md:h-[72px] flex items-center justify-between">
         
-        {/* Logo */}
-        <div className="relative w-[120px] h-[35px] md:w-[150px] md:h-[40px] shrink-0">
-          <Image src="/logo.svg" alt="The Laphing Co" fill className="object-contain object-left" priority />
-        </div>
-
-        {/* Action Buttons & Cart */}
-        <div className="flex items-center gap-4 md:gap-6 shrink-0">
-          <div className="hidden md:flex items-center gap-3">
-            <button className="text-[#FFDE59] border-2 border-[#FFDE59] hover:bg-[#FFDE59] hover:text-black transition-all duration-300 font-bold tracking-widest text-[12px] px-5 py-1.5 rounded-full cursor-pointer">
-              REFER
-            </button>
-            <button className="bg-[#FFDE59] text-black px-5 py-2 rounded-full text-[12px] font-bold tracking-widest hover:bg-[#e5c750] transition-colors cursor-pointer">
-              SIGN UP
-            </button>
+        {/* Left: The Laphing Co. Logo */}
+        <Link href="/" className="relative flex items-center shrink-0 group">
+          <div className="relative w-[115px] h-[36px] sm:w-[140px] sm:h-[42px] md:w-[165px] md:h-[48px] transition-transform duration-300 group-hover:scale-105">
+            <Image
+              src="/logomain.svg"
+              alt="The Laphing Co."
+              fill
+              className="object-contain object-left"
+              priority
+            />
           </div>
+        </Link>
+
+        {/* Right Nav Action Items: Refer, Cart, Signup / Avatar */}
+        <div className="flex items-center gap-2.5 sm:gap-4 md:gap-5">
           
-          {/* Hamburger Icon (Mobile Only) */}
-          <div 
-            className="flex md:hidden items-center justify-center cursor-pointer p-1 transition-transform hover:scale-110 active:scale-95"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          {/* 1. Refer Button / Icon */}
+          <button
+            onClick={openReferModal}
+            type="button"
+            className="flex items-center gap-1.5 text-white hover:text-[#FFDE59] bg-white/5 hover:bg-white/10 px-2.5 sm:px-3 py-1.5 rounded-full transition-all duration-200 active:scale-95 cursor-pointer"
+            title="Refer Friends & Earn Discounts"
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              {isMobileMenuOpen ? (
-                // Close Icon
-                <>
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </>
-              ) : (
-                // Hamburger Icon
-                <>
-                  <line x1="3" y1="12" x2="21" y2="12"></line>
-                  <line x1="3" y1="6" x2="21" y2="6"></line>
-                  <line x1="3" y1="18" x2="21" y2="18"></line>
-                </>
-              )}
-            </svg>
-          </div>
-          
-          <div className="relative cursor-pointer hover:opacity-80 transition-opacity flex items-center justify-center p-1 md:pr-2">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-            </svg>
-            <span className="absolute -top-1 right-0 md:right-1 bg-[#FFDE59] text-black text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">2</span>
-          </div>
-        </div>
-      </nav>
+            <Gift className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-[#FFDE59]" />
+            <span className="font-inter font-bold text-[12px] sm:text-[14px] tracking-wide">
+              Refer
+            </span>
+          </button>
 
-      {/* Mobile Dropdown Menu */}
-      {isMobileMenuOpen && (
-        <div className="absolute top-[120%] left-0 w-full bg-[#111111]/95 backdrop-blur-lg border border-[#FFDE59]/20 rounded-2xl p-5 flex flex-col gap-4 shadow-[0_20px_50px_rgba(0,0,0,0.5)] md:hidden animate-[fade-in-up_0.3s_ease-out_both]">
-          <button className="text-[#FFDE59] border-2 border-[#FFDE59] hover:bg-[#FFDE59] hover:text-black transition-all duration-300 font-bold tracking-widest text-[14px] px-5 py-3 rounded-full w-full">
-            REFER
-          </button>
-          <button className="bg-[#FFDE59] text-black px-5 py-3 rounded-full text-[14px] font-bold tracking-widest hover:bg-[#e5c750] transition-colors w-full shadow-[0_0_20px_rgba(255,222,89,0.2)]">
-            SIGN UP
-          </button>
+          {/* 2. Cart Icon */}
+          <Link
+            href="/checkout"
+            aria-label="View Shopping Cart / Pre-orders"
+            className="relative flex items-center justify-center text-white hover:text-[#FFDE59] bg-white/5 hover:bg-white/10 w-8 h-8 sm:w-9 sm:h-9 rounded-full transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer"
+            title="Cart & Checkout"
+          >
+            <ShoppingBag className="w-4 h-4 sm:w-[18px] sm:h-[18px]" />
+            {/* Notification pip */}
+            <span className="absolute top-1 right-1 w-2 h-2 bg-[#FFDE59] rounded-full animate-pulse" />
+          </Link>
+
+          {/* 3. Conditional: Signup Button (Logged Out) OR Avatar Icon (Logged In) */}
+          {!user ? (
+            <button
+              onClick={() => openAuthModal("signup")}
+              type="button"
+              className="bg-[#FFDE59] hover:bg-[#FFE58A] text-[#81191B] font-inter font-extrabold text-[12px] sm:text-[14px] uppercase tracking-wider px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full shadow-sm transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer"
+            >
+              Signup
+            </button>
+          ) : (
+            <Link
+              href="/profile"
+              aria-label="Go to User Profile"
+              className="flex items-center gap-2 group cursor-pointer text-white hover:text-[#FFDE59] transition-colors bg-white/5 hover:bg-white/10 px-2 sm:px-3 py-1.5 rounded-full"
+              title={`Profile (${displayName})`}
+            >
+              {/* User Avatar Circle */}
+              <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#FFDE59] text-[#81191B] flex items-center justify-center font-inter font-black text-[12px] sm:text-[13px] shadow-sm transition-transform group-hover:scale-105">
+                <UserIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5]" />
+              </div>
+
+              {/* Username (Desktop) */}
+              <span className="font-bebas text-white tracking-[0.08em] text-[16px] sm:text-[18px] uppercase group-hover:text-[#FFDE59] transition-colors leading-none pt-0.5 max-w-[80px] sm:max-w-[130px] truncate hidden xs:inline-block">
+                {displayName}
+              </span>
+            </Link>
+          )}
+
         </div>
-      )}
-    </div>
+
+      </div>
+    </header>
   );
 }

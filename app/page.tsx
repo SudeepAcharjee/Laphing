@@ -1,562 +1,744 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import Image from "next/image";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import SplashScreen from "@/components/SplashScreen";
+import Link from "next/link";
 import Navbar from "@/components/Navbar";
-
-const ingredients = [
-  { id: 1, name: "MASALA OIL", image: "/1.png", alt: "Masala Oil" },
-  { id: 2, name: "WAI WAI NOODLES", image: "/2.png", alt: "Wai Wai Noodles" },
-  { id: 3, name: "CHILLI GARLIC SAUCE", image: "/3.png", alt: "Chilli Garlic Sauce" },
-  { id: 4, name: "CHILLI FLAKES", image: "/4.png", alt: "Chilli Flakes" },
-  { id: 5, name: "DEHYDRATED VEGGIES", image: "/5.png", alt: "Dehydrated Veggies" },
-  { id: 6, name: "SESAME PASTE", image: "/6.png", alt: "Sesame Paste" },
-];
+import Footer from "@/components/Footer";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Home() {
-  const masterTrackRef = useRef<HTMLDivElement>(null);
-  const heroTextRef = useRef<HTMLDivElement>(null);
-  const heroSlotRef = useRef<HTMLDivElement>(null);
-  const landingSlotRef = useRef<HTMLDivElement>(null);
-  const packageRef = useRef<HTMLDivElement>(null);
-  const ingredientsPanelRef = useRef<HTMLDivElement>(null);
-  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const lineRefs = useRef<(SVGPathElement | null)[]>([]);
-  const dotRefs = useRef<(SVGCircleElement | null)[]>([]);
-  const spineClipRef = useRef<SVGRectElement>(null);
-  const packageFloatRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-
-    const ctx = gsap.context(() => {
-      if (!masterTrackRef.current || !packageRef.current || !heroTextRef.current) return;
-
-      if (packageFloatRef.current) {
-        gsap.to(packageFloatRef.current, {
-          y: -15,
-          rotation: 1.5,
-          duration: 3.5,
-          yoyo: true,
-          repeat: -1,
-          ease: "sine.inOut",
-        });
-      }
-
-      const mm = gsap.matchMedia();
-
-      // ================= DESKTOP & TABLET ANIMATION (lg: 1024px+) =================
-      mm.add("(min-width: 1024px)", () => {
-        const masterTl = gsap.timeline({
-          scrollTrigger: {
-            trigger: masterTrackRef.current,
-            start: "top top",
-            end: "bottom bottom",
-            scrub: 1.2,
-            invalidateOnRefresh: true,
-          },
-        });
-
-        // Initial setup for items and lines
-        itemRefs.current.forEach((item, index) => {
-          if (item) gsap.set(item, { opacity: 0, x: -25, scale: 0.75 });
-          const line = lineRefs.current[index];
-          if (line) {
-            const length = line.getTotalLength ? line.getTotalLength() : 110;
-            gsap.set(line, { strokeDasharray: length, strokeDashoffset: length });
-          }
-          if (dotRefs.current[index]) {
-            gsap.set(dotRefs.current[index], { opacity: 0 });
-          }
-        });
-
-        if (spineClipRef.current) {
-          gsap.set(spineClipRef.current, { attr: { height: 0 } });
-        }
-
-        // --- STEP 1: Hero Text Fades Out & Package Moves into Left Landing Position ---
-        masterTl
-          .to(heroTextRef.current, {
-            opacity: 0,
-            x: -50,
-            duration: 0.25,
-            ease: "power2.inOut",
-          }, 0.05)
-          .to(packageRef.current, {
-            x: () => {
-              const heroSlot = heroSlotRef.current?.getBoundingClientRect();
-              const landSlot = landingSlotRef.current?.getBoundingClientRect();
-              if (!heroSlot || !landSlot) return 0;
-              return (landSlot.left + landSlot.width / 2) - (heroSlot.left + heroSlot.width / 2);
-            },
-            y: () => {
-              const heroSlot = heroSlotRef.current?.getBoundingClientRect();
-              const landSlot = landingSlotRef.current?.getBoundingClientRect();
-              if (!heroSlot || !landSlot) return 0;
-              return (landSlot.top + landSlot.height / 2) - (heroSlot.top + heroSlot.height / 2);
-            },
-            scale: 0.96,
-            rotation: -3,
-            duration: 0.3,
-            ease: "power2.inOut",
-          }, 0.05)
-          .to(ingredientsPanelRef.current, {
-            opacity: 1,
-            duration: 0.1,
-          }, 0.25);
-
-        // --- Animate the Dotted Spine Drawing Downwards on Scroll ---
-        if (spineClipRef.current) {
-          masterTl.to(
-            spineClipRef.current,
-            {
-              attr: { height: 600 },
-              duration: 0.65,
-              ease: "none",
-            },
-            0.28
-          );
-        }
-
-        // --- STEP 2: 6 Ingredients reveal 1-by-1 with arrows ---
-        ingredients.forEach((_, index) => {
-          const item = itemRefs.current[index];
-          const line = lineRefs.current[index];
-          const startTime = 0.35 + index * 0.1;
-
-          if (item) {
-            masterTl.to(
-              item,
-              {
-                opacity: 1,
-                x: 0,
-                scale: 1,
-                duration: 0.09,
-                ease: "back.out(1.3)",
-              },
-              startTime
-            );
-          }
-
-          if (line) {
-            masterTl.to(
-              line,
-              {
-                strokeDashoffset: 0,
-                duration: 0.08,
-                ease: "power2.out",
-              },
-              startTime
-            );
-          }
-
-          if (dotRefs.current[index]) {
-            masterTl.to(
-              dotRefs.current[index],
-              { opacity: 1, duration: 0.05 },
-              startTime
-            );
-          }
-        });
-
-        masterTl.to({}, { duration: 0.1 });
-      });
-
-      // ================= MOBILE BREAKPOINT (< 1024px) =================
-      mm.add("(max-width: 1023px)", () => {
-        const masterTl = gsap.timeline({
-          scrollTrigger: {
-            trigger: masterTrackRef.current,
-            start: "top top",
-            end: "bottom bottom",
-            scrub: 1.2,
-            invalidateOnRefresh: true,
-          },
-        });
-
-        itemRefs.current.forEach((item, index) => {
-          if (item) gsap.set(item, { opacity: 0, x: 15, scale: 0.85 });
-          const line = lineRefs.current[index];
-          if (line) {
-            const length = line.getTotalLength ? line.getTotalLength() : 80;
-            gsap.set(line, { strokeDasharray: length, strokeDashoffset: length });
-          }
-          if (dotRefs.current[index]) {
-            gsap.set(dotRefs.current[index], { opacity: 0 });
-          }
-        });
-
-        // Step 1: Fade hero text and move package into mobile landing position
-        masterTl
-          .to(heroTextRef.current, {
-            opacity: 0,
-            y: -25,
-            duration: 0.25,
-            ease: "power2.inOut",
-          }, 0.05)
-          .to(packageRef.current, {
-            x: () => {
-              const heroSlot = heroSlotRef.current?.getBoundingClientRect();
-              const landSlot = landingSlotRef.current?.getBoundingClientRect();
-              if (!heroSlot || !landSlot) return 0;
-              return (landSlot.left + landSlot.width / 2) - (heroSlot.left + heroSlot.width / 2);
-            },
-            y: () => {
-              const heroSlot = heroSlotRef.current?.getBoundingClientRect();
-              const landSlot = landingSlotRef.current?.getBoundingClientRect();
-              if (!heroSlot || !landSlot) return 0;
-              return (landSlot.top + landSlot.height / 2) - (heroSlot.top + heroSlot.height / 2);
-            },
-            scale: 0.82,
-            rotation: -2,
-            duration: 0.3,
-            ease: "power2.inOut",
-          }, 0.05)
-          .to(ingredientsPanelRef.current, {
-            opacity: 1,
-            duration: 0.12,
-          }, 0.25);
-
-        if (spineClipRef.current) {
-          masterTl.to(
-            spineClipRef.current,
-            {
-              attr: { height: 600 },
-              duration: 0.65,
-              ease: "none",
-            },
-            0.28
-          );
-        }
-
-        // Step 2: Reveal the 6 ingredients on mobile with arrows
-        ingredients.forEach((_, index) => {
-          const item = itemRefs.current[index];
-          const line = lineRefs.current[index];
-          const startTime = 0.32 + index * 0.1;
-
-          if (item) {
-            masterTl.to(
-              item,
-              {
-                opacity: 1,
-                x: 0,
-                scale: 1,
-                duration: 0.09,
-                ease: "power2.out",
-              },
-              startTime
-            );
-          }
-
-          if (line) {
-            masterTl.to(
-              line,
-              {
-                strokeDashoffset: 0,
-                duration: 0.08,
-                ease: "power2.out",
-              },
-              startTime
-            );
-          }
-
-          if (dotRefs.current[index]) {
-            masterTl.to(
-              dotRefs.current[index],
-              { opacity: 1, duration: 0.05 },
-              startTime
-            );
-          }
-        });
-
-        masterTl.to({}, { duration: 0.1 });
-      });
-
-    }, masterTrackRef);
-
-    const timer = setTimeout(() => {
-      ScrollTrigger.refresh();
-    }, 400);
-
-    return () => {
-      clearTimeout(timer);
-      ctx.revert();
-    };
-  }, []);
+  const { openAuthModal } = useAuth();
 
   return (
-    <div className="relative min-h-screen bg-black font-sans text-white overflow-x-clip flex flex-col">
-      <SplashScreen />
-
-      {/* Ambient background vector details */}
-      <div className="fixed inset-0 z-0 pointer-events-none opacity-20">
-        <svg className="w-full h-full" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M-100 850 C 300 950, 500 650, 1500 800" stroke="#FFC107" strokeWidth="1" strokeDasharray="5 10" fill="transparent" opacity="0.4" />
-          <path d="M700 0 C 1000 300, 1100 150, 1500 500" stroke="#FFC107" strokeWidth="1" strokeDasharray="5 10" fill="transparent" opacity="0.4" />
-          <path d="M-50 400 C 400 300, 800 600, 1500 100" stroke="#FFC107" strokeWidth="1" strokeDasharray="5 10" fill="transparent" opacity="0.2" />
-        </svg>
-      </div>
-
+    <div className="relative min-h-screen w-full bg-[#741117] font-sans text-white flex flex-col select-none overflow-x-hidden">
+      {/* ================= MAROON & CREAM NAVBAR ================= */}
       <Navbar />
 
-      {/* ================= UNIFIED SCROLL TRACK ================= */}
-      <div 
-        ref={masterTrackRef} 
-        id="interactive-experience-track"
-        className="relative h-[380vh] w-full"
-      >
-        {/* Sticky Stage Viewport */}
-        <div className="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden pt-16 sm:pt-20 md:pt-24 pb-4 sm:pb-6 px-4 sm:px-8 md:px-14 lg:px-24 xl:px-36 2xl:px-44">
+      {/* ================= HERO SECTION ================= */}
+      <main className="relative w-full bg-[#741117]">
+        <Image
+          src="/hero.png"
+          alt="The Laphing Co. - Love. Laph. Cheat. Chilli Garlic Laphing"
+          width={1440}
+          height={810}
+          priority
+          quality={100}
+          className="w-full h-auto block"
+          sizes="100vw"
+        />
+      </main>
+
+      {/* ================= CALLOUT BANNER ================= */}
+      <section className="relative w-full bg-[#6B1319] select-none border-t border-black/10">
+        <div className="w-full max-w-[1440px] mx-auto px-6 sm:px-10 md:px-16 lg:px-20 py-7 sm:py-9 md:py-10 flex flex-col md:flex-row items-center justify-between gap-5 sm:gap-6">
           
-          {/* Hero Screen Background Image */}
-          <div className="absolute inset-0 z-0 pointer-events-none select-none">
-            <Image
-              src="/image.png"
-              alt="Hero Background"
-              fill
-              priority
-              quality={90}
-              className="object-cover object-center opacity-80"
-            />
-            {/* Smooth, premium gradient overlay for perfect contrast */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-[#050300] mix-blend-multiply" />
-          </div>
-
-          <div className="relative w-full max-w-[1140px] xl:max-w-[1180px] mx-auto h-full flex items-center justify-between gap-2 sm:gap-4 md:gap-8 lg:gap-12">
-            
-            {/* ================= LEFT COLUMN: Hero Text (Top) -> Product Package Lands Here on Scroll ================= */}
-            <div className="relative w-[45%] sm:w-[48%] lg:w-[50%] xl:w-[52%] h-full flex items-center justify-start z-20">
-              
-              {/* Hero Left Content (Visible at top, fades out on scroll) */}
-              <div 
-                ref={heroTextRef} 
-                className="flex flex-col items-start text-left z-20 shrink-0 w-full"
-              >
-                {/* Tagline */}
-                <div className="mb-3 sm:mb-4 md:mb-5 animate-[fade-in-up_0.8s_ease-out_2.6s_both]">
-                  <span className="text-[#FFAE00] font-inter font-semibold tracking-[0.25em] text-[10px] sm:text-[12px] md:text-[14px] uppercase">
-                    SPICY. TANGY. ADDICTIVE.
-                  </span>
-                </div>
-
-                {/* Main Headline */}
-                <h1 className="font-bebas text-[48px] sm:text-[68px] md:text-[92px] lg:text-[112px] xl:text-[136px] leading-[0.85] tracking-[0.03em] uppercase mb-4 sm:mb-6 md:mb-8 animate-[fade-in-up_0.8s_ease-out_2.8s_both]">
-                  <span className="text-white block">LOVE.</span>
-                  <span className="text-[#FFAE00] block">LAPH.</span>
-                  <span className="text-white block">CHEAT.</span>
-                </h1>
-                
-                {/* Subtitle */}
-                <p className="text-white/60 font-inter text-[14px] sm:text-[16px] md:text-[18px] leading-relaxed font-light mb-8 sm:mb-10 md:mb-12 animate-[fade-in-up_0.8s_ease-out_3.0s_both] max-w-[100%] sm:max-w-[95%] pr-4">
-                  Not just a snack, it’s a whole <span className="text-white font-medium">vibe</span>.<br />
-                  Get ready for the boldest flavours in every bite.
-                </p>
-                
-                {/* CTA Button */}
-                <div className="flex items-center gap-3 sm:gap-4 animate-[fade-in-up_0.8s_ease-out_3.2s_both] relative group">
-                  {/* Clean mascot, no bouncy animations */}
-                  <div className="absolute -top-[30px] left-[170px] sm:-top-[38px] sm:left-[200px] md:-top-[42px] md:left-[240px] w-[36px] h-[36px] sm:w-[48px] sm:h-[48px] md:w-[56px] md:h-[56px] z-10 origin-bottom pointer-events-none transition-transform duration-500 group-hover:-translate-y-2">
-                    <Image src="/sitting.svg" alt="Sitting Mascot" fill className="object-contain" />
-                  </div>
-
-                  <button className="bg-[#FFAE00] hover:bg-white text-black px-8 py-3.5 sm:px-10 sm:py-4 md:px-12 md:py-5 rounded-full font-bold font-inter text-[12px] sm:text-[14px] md:text-[15px] tracking-[0.05em] uppercase flex items-center gap-3 transition-colors duration-300 shadow-[0_10px_40px_-10px_rgba(255,174,0,0.5)] hover:shadow-[0_10px_40px_-10px_rgba(255,255,255,0.5)]">
-                    <span>Join Waitlist</span>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 transition-transform group-hover:translate-x-1">
-                      <path d="M5 12h14"></path>
-                      <path d="M13 5l7 7-7 7"></path>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-
-              {/* Left-Aligned Package Landing Slot (Package slides here on scroll) */}
-              <div 
-                ref={landingSlotRef} 
-                id="landing-slot"
-                className="absolute left-0 w-full max-w-[170px] sm:max-w-[240px] md:max-w-[320px] lg:max-w-[430px] xl:max-w-[460px] h-[220px] sm:h-[280px] md:h-[380px] lg:h-[480px] xl:h-[530px] flex items-center justify-start pointer-events-none"
-              />
-
-              {/* Ambient golden aura behind the left-aligned product landing spot */}
-              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[220px] sm:w-[320px] lg:w-[420px] h-[220px] sm:h-[320px] lg:h-[420px] rounded-full bg-[#FFAE00]/12 blur-[90px] lg:blur-[130px] pointer-events-none" />
-            </div>
-
-            {/* ================= RIGHT COLUMN: Hero Package (Starts Here) -> 6 Ingredients Reveal Here ================= */}
-            <div className="relative w-[55%] sm:w-[52%] lg:w-[50%] xl:w-[48%] h-full flex items-center justify-end z-30">
-              
-              {/* Subtle ambient glow behind the product */}
-              <div className="absolute right-[10%] top-1/2 -translate-y-1/2 w-[250px] sm:w-[350px] lg:w-[500px] h-[250px] sm:h-[350px] lg:h-[500px] rounded-full bg-[#FFAE00]/10 blur-[100px] lg:blur-[150px] pointer-events-none mix-blend-screen" />
-
-              {/* Product Package Start Slot */}
-              <div 
-                ref={heroSlotRef} 
-                id="hero-slot"
-                className="absolute right-0 w-full max-w-[170px] sm:max-w-[240px] md:max-w-[320px] lg:max-w-[430px] xl:max-w-[460px] h-[220px] sm:h-[280px] md:h-[380px] lg:h-[480px] xl:h-[530px] flex justify-end items-center pointer-events-none z-30"
-              >
-                {/* Product Package Box (Starts on Right of Hero, glides to Left Landing Slot) */}
-                <div 
-                  ref={packageRef} 
-                  className="relative w-full h-full flex justify-center items-center pointer-events-auto will-change-transform z-30"
-                >
-                  <div className="relative w-full h-full animate-hero-entrance">
-                    {/* Inner wrapper for continuous floating animation */}
-                    <div ref={packageFloatRef} className="w-full h-full relative">
-                      <Image 
-                        src="/hero.png" 
-                        alt="The Laphing Co Product Package" 
-                        fill
-                        sizes="(max-width: 640px) 170px, (max-width: 1024px) 320px, 460px" 
-                        className="object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.7)]" 
-                        priority 
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right: The 6 Ingredients Stack & Curved Pointer Flow */}
-              <div 
-                ref={ingredientsPanelRef}
-                className="relative w-full max-w-[260px] sm:max-w-[300px] md:max-w-[380px] lg:max-w-[460px] xl:max-w-[500px] aspect-[5/6] opacity-0 transition-opacity duration-300"
-              >
-                {/* Unified SVG containing the animated spine curve and 6 straight arrows */}
-                <svg className="absolute inset-0 w-full h-full overflow-visible pointer-events-none z-10" viewBox="0 0 500 600" fill="none">
-                  <defs>
-                    <clipPath id="spine-draw-clip">
-                      <rect ref={spineClipRef} x="0" y="0" width="200" height="0" />
-                    </clipPath>
-                    <marker
-                      id="arrowhead"
-                      markerWidth="5"
-                      markerHeight="5"
-                      refX="4"
-                      refY="2.5"
-                      orient="auto"
-                    >
-                      <polygon points="0 0, 5 2.5, 0 5" fill="#FFAE00" />
-                    </marker>
-                  </defs>
-
-                  {/* Elegant, crisp spine arc */}
-                  <path 
-                    d="M 40 50 Q 160 300 40 550" 
-                    stroke="#FFAE00" 
-                    strokeWidth="1.5" 
-                    strokeDasharray="4 6" 
-                    strokeLinecap="round"
-                    opacity="0.3"
-                    clipPath="url(#spine-draw-clip)"
-                  />
-
-                  {ingredients.map((item, index) => {
-                    // Exact intersection points on the quadratic bezier spine
-                    const yCoords = [50, 150, 250, 350, 450, 550];
-                    const xCoords = [40, 78, 98, 98, 78, 40];
-                    const targetX = 160;
-                    const Y = yCoords[index];
-                    const X = xCoords[index];
-
-                    return (
-                      <g key={`svg-${item.id}`}>
-                        {/* Crisp Straight Animated Arrow */}
-                        <path 
-                          ref={(el) => { lineRefs.current[index] = el; }}
-                          d={`M ${X} ${Y} L ${targetX} ${Y}`}
-                          stroke="#FFAE00" 
-                          strokeWidth="1.5" 
-                          opacity="0.7"
-                          markerEnd="url(#arrowhead)"
-                        />
-                        {/* Minimal Node Dot */}
-                        <circle 
-                          ref={(el) => { dotRefs.current[index] = el; }}
-                          cx={X} cy={Y} r="3.5" 
-                          fill="#FFAE00" 
-                        />
-                      </g>
-                    );
-                  })}
-                </svg>
-
-                {/* HTML Overlays accurately positioned relative to the SVG ViewBox */}
-                {ingredients.map((item, index) => {
-                  const yCoords = [50, 150, 250, 350, 450, 550];
-                  const topPercent = (yCoords[index] / 600) * 100;
-                  const leftPercent = (175 / 500) * 100; // Leaves 15px gap from arrow tip
-                  const widthPercent = ((500 - 175) / 500) * 100;
-
-                  return (
-                    <div 
-                      key={item.id}
-                      className="absolute z-20"
-                      style={{ 
-                        top: `${topPercent}%`, 
-                        left: `${leftPercent}%`,
-                        transform: 'translateY(-50%)',
-                        width: `${widthPercent}%`
-                      }}
-                    >
-                      {/* Clean inner wrapper */}
-                      <div 
-                        ref={(el) => { itemRefs.current[index] = el; }}
-                        className="flex items-center gap-4 sm:gap-5 md:gap-6 cursor-pointer group hover:translate-x-2 transition-transform duration-500 ease-out py-2"
-                      >
-                        {/* Pouch Image - natural realistic shadow */}
-                        <div className="relative w-[36px] h-[36px] sm:w-[48px] sm:h-[48px] md:w-[60px] md:h-[60px] lg:w-[72px] lg:h-[72px] shrink-0 flex items-center justify-center z-10 transition-transform duration-500 ease-out group-hover:scale-110">
-                          <Image 
-                            src={item.image} 
-                            alt={item.alt} 
-                            fill 
-                            sizes="(max-width: 640px) 36px, (max-width: 1024px) 60px, 72px"
-                            className="object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)]" 
-                          />
-                        </div>
-
-                        {/* Minimal Text Content */}
-                        <div className="flex flex-col items-start min-w-0 z-10 relative">
-                          <span className="font-bebas text-[16px] sm:text-[20px] md:text-[26px] lg:text-[32px] tracking-[0.05em] text-white/60 uppercase font-medium leading-none group-hover:text-white transition-colors duration-300 truncate">
-                            {item.name}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-            </div>
-
-          </div>
-        </div>
-      </div>
-
-      {/* ================= PAGE 3: BOTTOM CTA SECTION ================= */}
-      <section className="relative w-full py-32 sm:py-40 px-6 sm:px-8 flex flex-col items-center justify-center text-center border-t border-white/5 bg-[#050300] z-20 overflow-hidden">
-        
-        {/* Soft, minimal ambient glow */}
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[80%] max-w-[800px] h-[400px] bg-[#FFAE00]/5 blur-[150px] rounded-t-full pointer-events-none" />
-
-        <div className="max-w-[800px] flex flex-col items-center relative z-10">
-          <span className="text-[#FFAE00] font-inter font-semibold tracking-[0.3em] text-[10px] md:text-[12px] uppercase mb-6">
-            READY IN 7 MINUTES
-          </span>
-          <h2 className="font-bebas text-[56px] sm:text-[76px] md:text-[104px] leading-[0.85] tracking-tight uppercase text-white mb-10">
-            CRAVING SATISFACTION, <br />
-            <span className="text-[#FFAE00]">DELIVERED.</span>
+          {/* Headline */}
+          <h2 className="font-inter font-black text-white text-[24px] sm:text-[28px] md:text-[34px] lg:text-[40px] tracking-tight uppercase text-center md:text-left leading-tight drop-shadow-sm">
+            CRAVING LAPHING? WE GET IT.
           </h2>
-          <button className="bg-[#FFAE00] hover:bg-white text-black px-10 py-4 sm:px-12 sm:py-5 rounded-full font-bold font-inter text-[13px] sm:text-[15px] tracking-[0.05em] uppercase flex items-center gap-3 transition-colors duration-300 shadow-[0_10px_40px_-10px_rgba(255,174,0,0.5)] hover:shadow-[0_10px_40px_-10px_rgba(255,255,255,0.5)]">
-            <span>Order Your Pack Now</span>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="transition-transform group-hover:translate-x-1.5">
-              <path d="M5 12h14"></path>
-              <path d="M13 5l7 7-7 7"></path>
-            </svg>
+
+          {/* Action Button */}
+          <button
+            onClick={() => openAuthModal("signup")}
+            type="button"
+            className="shrink-0 inline-flex items-center justify-center bg-[#FFDE59] hover:bg-[#FFE58A] text-[#741117] font-inter font-bold text-[16px] sm:text-[18px] tracking-wide px-8 sm:px-10 py-3.5 sm:py-4 rounded-full shadow-[0_4px_14px_rgba(0,0,0,0.25)] hover:shadow-[0_6px_20px_rgba(255,222,89,0.35)] transition-all duration-200 hover:scale-[1.03] active:scale-[0.98] text-center cursor-pointer"
+          >
+            Join the waitlist
           </button>
         </div>
       </section>
 
+      {/* ================= SECTION 2: WHAT'S INSIDE THIS BADDIE? ================= */}
+      <section className="relative w-full overflow-hidden select-none bg-[#FFDD6E]">
+        {/* Subtle Central Backdrop Shape Framing Pouch - Desktop Only */}
+        <div className="hidden md:flex absolute inset-0 w-full h-full pointer-events-none items-center justify-center">
+          <svg className="w-full h-full max-w-[1440px]" viewBox="0 0 1440 1120" fill="none" preserveAspectRatio="none">
+            <path
+              d="M 480 180 C 510 500, 440 800, 360 1120 L 1080 1120 C 1000 800, 930 500, 960 180 Z"
+              fill="rgba(255, 255, 255, 0.22)"
+            />
+          </svg>
+        </div>
+
+        {/* ================= DESKTOP & TABLET STAGE (768px+) - Exact Figma Proportions ================= */}
+        <div className="hidden md:block relative w-full max-w-[1440px] aspect-[1440/1120] mx-auto z-10">
+
+          {/* SVG Connector Trails & Sparkles */}
+          <svg className="absolute inset-0 w-full h-full pointer-events-none overflow-visible z-10" viewBox="0 0 1440 1120" fill="none">
+            {/* Flavour-trail-0 (Chilli Sauce to Pouch) */}
+            <path 
+              d="M 350 320 C 410 335, 470 345, 525 335" 
+              stroke="#81191B" 
+              strokeWidth="3.2" 
+              strokeDasharray="4 6" 
+              opacity="0.8" 
+              strokeLinecap="round" 
+            />
+            
+            {/* Flavour-trail-1 (Soya Granules to Pouch) */}
+            <path 
+              d="M 370 550 C 420 555, 470 550, 520 540" 
+              stroke="#81191B" 
+              strokeWidth="3.2" 
+              strokeDasharray="4 6" 
+              opacity="0.8" 
+              strokeLinecap="round" 
+            />
+            
+            {/* Flavour-trail-2 (Laphing Sheets to Card/Shadow left) */}
+            <path 
+              d="M 380 810 C 425 815, 460 805, 495 775" 
+              stroke="#81191B" 
+              strokeWidth="3.2" 
+              strokeDasharray="4 6" 
+              opacity="0.8" 
+              strokeLinecap="round" 
+            />
+            
+            {/* Flavour-trail-3 (Wai Wai Noodles to Pouch) */}
+            <path 
+              d="M 1060 325 C 1010 338, 960 342, 915 340" 
+              stroke="#81191B" 
+              strokeWidth="3.2" 
+              strokeDasharray="4 6" 
+              opacity="0.8" 
+              strokeLinecap="round" 
+            />
+            
+            {/* Flavour-trail-4 (Sauce Mix to Pouch / Shadow right) */}
+            <path 
+              d="M 1065 550 C 1015 555, 965 550, 920 545" 
+              stroke="#81191B" 
+              strokeWidth="3.2" 
+              strokeDasharray="4 6" 
+              opacity="0.8" 
+              strokeLinecap="round" 
+            />
+            
+            {/* Flavour-trail-5 (Garlic Flakes to Card right) */}
+            <path 
+              d="M 1060 810 C 1015 805, 975 795, 940 775" 
+              stroke="#81191B" 
+              strokeWidth="3.2" 
+              strokeDasharray="4 6" 
+              opacity="0.8" 
+              strokeLinecap="round" 
+            />
+
+            {/* Top Accents / Dash Marks */}
+            {/* Top-Left under subtitle */}
+            <line x1="435" y1="185" x2="442" y2="215" stroke="#81191B" strokeWidth="4.5" strokeLinecap="round" />
+            <line x1="472" y1="175" x2="467" y2="215" stroke="#81191B" strokeWidth="4.5" strokeLinecap="round" />
+
+            {/* Top-Right under subtitle */}
+            <line x1="920" y1="175" x2="898" y2="210" stroke="#81191B" strokeWidth="4.5" strokeLinecap="round" />
+
+            {/* Bottom-Left Dash Marks (Exact from Screenshot) */}
+            <line x1="400" y1="915" x2="422" y2="975" stroke="#81191B" strokeWidth="5.5" strokeLinecap="round" />
+            <line x1="380" y1="1050" x2="420" y2="1025" stroke="#81191B" strokeWidth="5.5" strokeLinecap="round" />
+
+            {/* Bottom-Right Dash Marks (Exact from Screenshot) */}
+            <line x1="1040" y1="985" x2="1000" y2="1010" stroke="#81191B" strokeWidth="5.5" strokeLinecap="round" />
+            <line x1="995" y1="1055" x2="1040" y2="1095" stroke="#81191B" strokeWidth="5.5" strokeLinecap="round" />
+          </svg>
+
+          {/* WHAT GOES INTO THE GOOD STUFF */}
+          <div 
+            className="absolute text-center z-20 pointer-events-none"
+            style={{ left: '30%', right: '30%', top: '4.5%' }}
+          >
+            <span className="font-inter font-bold text-[#81191B] text-[15px] sm:text-[16px] leading-[19px] tracking-wider uppercase block">
+              WHAT GOES INTO THE GOOD STUFF
+            </span>
+          </div>
+
+          {/* What’s inside this Baddie? */}
+          <div 
+            className="absolute text-center z-20 pointer-events-none"
+            style={{ left: '15%', right: '15%', top: '6.8%' }}
+          >
+            <h2 className="font-inter font-black text-[#81191B] text-[48px] lg:text-[64px] leading-tight tracking-tight block">
+              What’s inside this Baddie?
+            </h2>
+          </div>
+
+          {/* Six little personalities. One big craving. */}
+          <div 
+            className="absolute text-center z-20 pointer-events-none"
+            style={{ left: '25%', right: '25%', top: '14.5%' }}
+          >
+            <p className="font-inter font-medium text-[#81191B] text-[19px] lg:text-[21px] leading-[26px] block">
+              Six little personalities. One big craving.
+            </p>
+          </div>
+
+          {/* Center Pouch (/about/center.png) */}
+          <div 
+            className="absolute z-20 transition-transform duration-300 hover:scale-[1.03]"
+            style={{
+              left: '36.5%',
+              right: '36.5%',
+              top: '21%',
+              bottom: '29.5%',
+              transform: 'rotate(-3deg)',
+            }}
+          >
+            <div className="relative w-full h-full drop-shadow-[0_16px_30px_rgba(129,25,27,0.12)]">
+              <Image
+                src="/about/center.png"
+                alt="Laphing Packaging Pouch"
+                fill
+                priority
+                className="object-contain"
+                sizes="(max-width: 1440px) 28vw, 400px"
+              />
+            </div>
+          </div>
+
+          {/* Oval Pouch Shadow (Warm terracotta-tan ellipse right under pouch bottom) */}
+          <div 
+            className="absolute pointer-events-none z-15"
+            style={{
+              left: '50%',
+              transform: 'translateX(-50%)',
+              top: '68%',
+              width: '360px',
+              height: '68px',
+              backgroundColor: 'rgba(129, 25, 27, 0.14)',
+              borderRadius: '50%',
+              opacity: 0.88,
+              filter: 'blur(3px)',
+            }}
+          />
+
+          {/* Badge: Ready in 5 mins! (Compact smaller box, positioned lower down, rotated 4.5deg) */}
+          <div 
+            className="absolute z-20 flex items-center justify-center rounded-[14px] shadow-[0_10px_24px_rgba(130,80,60,0.08)] border border-[#EFE5D5] transition-transform duration-300 hover:scale-105"
+            style={{
+              left: '50%',
+              transform: 'translateX(-50%) rotate(4.5deg)',
+              top: '77%',
+              width: '335px',
+              height: '70px',
+              backgroundColor: '#FFFDF6',
+            }}
+          >
+            <span className="font-inter font-bold text-[#81191B] text-[22px] lg:text-[25px] leading-none tracking-normal text-center select-none px-4 py-1">
+              Ready in 5 mins!
+            </span>
+          </div>
+
+          {/* 1. Chilli Sauce (1.svg) - Top-Left (Scaled down & balanced) */}
+          <div 
+            className="absolute z-20 transition-transform duration-300 hover:scale-105 cursor-pointer"
+            style={{
+              left: '9%',
+              top: '20%',
+              width: '15.5%',
+              height: '18.5%',
+            }}
+          >
+            <div className="relative w-full h-full drop-shadow-[0_8px_18px_rgba(0,0,0,0.06)]">
+              <Image
+                src="/about/1.svg"
+                alt="Chilli Sauce Character"
+                fill
+                unoptimized
+                className="object-contain"
+              />
+            </div>
+          </div>
+
+          {/* 2. Soya Granules (5.svg) - Middle-Left */}
+          <div 
+            className="absolute z-20 transition-transform duration-300 hover:scale-105 cursor-pointer"
+            style={{
+              left: '7%',
+              top: '45%',
+              width: '19.5%',
+              height: '17.5%',
+            }}
+          >
+            <div className="relative w-full h-full drop-shadow-[0_8px_18px_rgba(0,0,0,0.06)]">
+              <Image
+                src="/about/5.svg"
+                alt="Soya Granules Character"
+                fill
+                unoptimized
+                className="object-contain"
+              />
+            </div>
+          </div>
+
+          {/* 3. Laphing Sheets (6.svg) - Bottom-Left */}
+          <div 
+            className="absolute z-20 transition-transform duration-300 hover:scale-105 cursor-pointer"
+            style={{
+              left: '7%',
+              top: '68%',
+              width: '20%',
+              height: '18%',
+            }}
+          >
+            <div className="relative w-full h-full drop-shadow-[0_8px_18px_rgba(0,0,0,0.06)]">
+              <Image
+                src="/about/6.svg"
+                alt="Laphing Sheets Character"
+                fill
+                unoptimized
+                className="object-contain"
+              />
+            </div>
+          </div>
+
+          {/* 4. Wai Wai Noodles (4.svg) - Top-Right (Scaled down & balanced) */}
+          <div 
+            className="absolute z-20 transition-transform duration-300 hover:scale-105 cursor-pointer"
+            style={{
+              left: '74%',
+              top: '20%',
+              width: '16%',
+              height: '18.5%',
+            }}
+          >
+            <div className="relative w-full h-full drop-shadow-[0_8px_18px_rgba(0,0,0,0.06)]">
+              <Image
+                src="/about/4.svg"
+                alt="Wai Wai Noodles Character"
+                fill
+                unoptimized
+                className="object-contain"
+              />
+            </div>
+          </div>
+
+          {/* 5. Sauce Mix (2.svg) - Middle-Right */}
+          <div 
+            className="absolute z-20 transition-transform duration-300 hover:scale-105 cursor-pointer"
+            style={{
+              left: '74%',
+              top: '45%',
+              width: '16%',
+              height: '18%',
+            }}
+          >
+            <div className="relative w-full h-full drop-shadow-[0_8px_18px_rgba(0,0,0,0.06)]">
+              <Image
+                src="/about/2.svg"
+                alt="Sauce Mix Character"
+                fill
+                unoptimized
+                className="object-contain"
+              />
+            </div>
+          </div>
+
+          {/* 6. Garlic Flakes (3.svg) - Bottom-Right */}
+          <div 
+            className="absolute z-20 transition-transform duration-300 hover:scale-105 cursor-pointer"
+            style={{
+              left: '74%',
+              top: '68%',
+              width: '16.5%',
+              height: '17%',
+            }}
+          >
+            <div className="relative w-full h-full drop-shadow-[0_8px_18px_rgba(0,0,0,0.06)]">
+              <Image
+                src="/about/3.svg"
+                alt="Garlic Flakes Character"
+                fill
+                unoptimized
+                className="object-contain"
+              />
+            </div>
+          </div>
+
+        </div>
+
+        {/* ================= MOBILE STACK (< 768px) ================= */}
+        <div className="md:hidden relative z-10 w-full max-w-[500px] mx-auto px-5 py-14 flex flex-col items-center">
+          
+          {/* Mobile Header */}
+          <div className="text-center mb-8">
+            <span className="font-inter font-bold text-[#81191B] text-[13px] tracking-widest uppercase block mb-2">
+              WHAT GOES INTO THE GOOD STUFF
+            </span>
+            <h2 className="font-inter font-black text-[#81191B] text-[34px] sm:text-[42px] leading-[1.08] tracking-tight block mb-2.5">
+              What’s inside this Baddie?
+            </h2>
+            <p className="font-inter font-medium text-[#81191B] text-[15px] sm:text-[16px] block">
+              Six little personalities. One big craving.
+            </p>
+          </div>
+
+          {/* Center Pouch */}
+          <div className="relative w-[240px] sm:w-[280px] aspect-[470/622] rotate-[-3deg] drop-shadow-[0_16px_28px_rgba(129,25,27,0.14)] mb-2">
+            <Image
+              src="/about/center.png"
+              alt="Laphing Packaging Pouch"
+              fill
+              priority
+              className="object-contain"
+              sizes="280px"
+            />
+          </div>
+
+          {/* Mobile Oval Shadow */}
+          <div className="w-[230px] sm:w-[260px] h-[40px] rounded-[50%] bg-[#81191B]/15 -mt-6 mb-3 pointer-events-none" />
+
+          {/* Mobile Badge: Ready in 5 mins! (Compact, Rotated Clockwise 4.5deg) */}
+          <div className="px-6 py-2.5 rounded-xl bg-[#FFFDF6] border border-[#EFE5D5] shadow-[0_6px_18px_rgba(130,80,60,0.08)] mb-8 rotate-[4.5deg]">
+            <span className="font-inter font-bold text-[#81191B] text-[17px] sm:text-[19px] tracking-normal block leading-none">
+              Ready in 5 mins!
+            </span>
+          </div>
+
+          {/* 6 SVG Mascots Grid on Mobile */}
+          <div className="grid grid-cols-2 gap-4 w-full">
+            {[
+              { src: "/about/1.svg", alt: "Chilli Sauce" },
+              { src: "/about/4.svg", alt: "Wai Wai Noodles" },
+              { src: "/about/5.svg", alt: "Soya Granules" },
+              { src: "/about/2.svg", alt: "Sauce Mix" },
+              { src: "/about/6.svg", alt: "Laphing Sheets" },
+              { src: "/about/3.svg", alt: "Garlic Flakes" },
+            ].map((item, idx) => (
+              <div 
+                key={idx}
+                className="relative w-full aspect-square flex items-center justify-center p-2 group transition-transform duration-300 hover:scale-105"
+              >
+                <div className="relative w-full h-full max-h-[140px] drop-shadow-[0_4px_12px_rgba(0,0,0,0.06)]">
+                  <Image
+                    src={item.src}
+                    alt={item.alt}
+                    fill
+                    unoptimized
+                    className="object-contain"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+
+        </div>
+
+      </section>
+
+      {/* ================= SECTION 3: GET ON THE LIST (Waitlist & Discount) ================= */}
+      <section className="relative w-full overflow-hidden select-none bg-[#741117]">
+        
+        {/* ================= DESKTOP STAGE (1024px+) - Auto-Adjusting Aspect Ratio matching 20%offbg.png ================= */}
+        <div className="hidden lg:block relative w-full max-w-[1440px] aspect-[1440/880] mx-auto">
+          
+          {/* Section Background (20%offbg.png) */}
+          <Image
+            src="/20%25offbg.png"
+            alt="Get on the List Background"
+            fill
+            priority
+            unoptimized
+            className="w-full h-full object-cover pointer-events-none select-none z-0"
+            sizes="100vw"
+          />
+
+          {/* Left Content Column */}
+          <div 
+            className="absolute z-10 flex flex-col justify-center"
+            style={{
+              left: '9%',
+              top: '5%',
+              bottom: '5%',
+              width: '45%',
+            }}
+          >
+            {/* Eyebrow */}
+            <span className="font-inter font-bold text-white text-[12px] xl:text-[13px] 2xl:text-[14px] tracking-[0.12em] uppercase block mb-2 xl:mb-2.5">
+              YOUR NEXT CRAVING STARTS HERE
+            </span>
+
+            {/* Main Headline */}
+            <h2 className="font-inter font-bold text-white text-[34px] xl:text-[42px] 2xl:text-[48px] leading-[1.08] tracking-tight block mb-5 xl:mb-6">
+              Get on the List (it’s free)
+            </h2>
+
+            {/* Tier 1: 20% OFF */}
+            <div className="mb-4 xl:mb-5">
+              <span className="font-inter font-black text-[#FFDE6E] text-[56px] xl:text-[70px] 2xl:text-[78px] leading-none tracking-tight block mb-1 xl:mb-1.5">
+                20% OFF
+              </span>
+              <p className="font-inter font-medium text-white text-[15px] xl:text-[17px] 2xl:text-[18px] block">
+                Join the waitlist, save when you pre-order
+              </p>
+            </div>
+
+            {/* CTA Button */}
+            <div className="mb-4 xl:mb-5">
+              <button
+                onClick={() => openAuthModal("signup")}
+                type="button"
+                className="inline-flex items-center gap-2.5 bg-[#FFDE6E] hover:bg-[#FFE58A] text-[#81191B] font-inter font-black text-[13px] xl:text-[15px] tracking-wide uppercase px-7 xl:px-8 py-3 xl:py-3.5 rounded-full shadow-[0_4px_16px_rgba(0,0,0,0.25)] hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer"
+              >
+                <span>JOIN THE WAITLIST</span>
+                <span className="text-[17px] xl:text-[19px] font-bold leading-none">&rarr;</span>
+              </button>
+            </div>
+
+            {/* Offer Subtext & Divider Line */}
+            <div className="w-full max-w-[380px] xl:max-w-[420px] mb-4 xl:mb-5">
+              <p className="font-inter font-bold text-white text-[14px] xl:text-[16px] tracking-tight mb-2">
+                Get up to 30% off on pre-orders
+              </p>
+              <div className="w-full h-[1.5px] bg-white/35" />
+            </div>
+
+            {/* Tier 2: +10% OFF */}
+            <div>
+              <span className="font-inter font-black text-[#FFDE6E] text-[56px] xl:text-[70px] 2xl:text-[78px] leading-none tracking-tight block mb-1 xl:mb-1.5">
+                +10% OFF
+              </span>
+              <p className="font-inter font-medium text-white text-[15px] xl:text-[17px] 2xl:text-[18px] block">
+                Share your referral code with 2 friends.
+              </p>
+            </div>
+          </div>
+
+          {/* Right Content Column: Packaging Pouch (pack.png) */}
+          <div 
+            className="absolute z-10 transition-transform duration-300 hover:scale-[1.02]"
+            style={{
+              left: '58%',
+              top: '10%',
+              width: '33%',
+              height: '80%',
+            }}
+          >
+            <div className="relative w-full h-full">
+              {/* Top-left tick marks (//) */}
+              <div className="absolute -top-3 -left-6 pointer-events-none z-20">
+                <svg width="40" height="36" viewBox="0 0 40 36" fill="none">
+                  <line x1="8" y1="26" x2="22" y2="6" stroke="#FFDE6E" strokeWidth="3" strokeLinecap="round" />
+                  <line x1="22" y1="30" x2="36" y2="10" stroke="#FFDE6E" strokeWidth="3" strokeLinecap="round" />
+                </svg>
+              </div>
+
+              {/* Bottom-right tick mark (\) */}
+              <div className="absolute -bottom-2 -right-6 pointer-events-none z-20">
+                <svg width="34" height="28" viewBox="0 0 34 28" fill="none">
+                  <line x1="6" y1="6" x2="28" y2="22" stroke="#FFDE6E" strokeWidth="3" strokeLinecap="round" />
+                </svg>
+              </div>
+
+              {/* Pouch Image with subtle drop shadow and white contour */}
+              <Image
+                src="/pack.png"
+                alt="Laphing Packaging Pouch"
+                fill
+                priority
+                className="object-contain filter drop-shadow-[0_15px_30px_rgba(0,0,0,0.35)]"
+                sizes="(max-width: 1440px) 35vw, 500px"
+              />
+            </div>
+          </div>
+
+        </div>
+
+        {/* ================= MOBILE & TABLET STACK (< 1024px) ================= */}
+        <div className="lg:hidden relative z-10 w-full py-12 sm:py-14 px-6 sm:px-10 flex flex-col items-center">
+          {/* Background image covering mobile section */}
+          <div className="absolute inset-0 w-full h-full pointer-events-none -z-10">
+            <Image
+              src="/20%25offbg.png"
+              alt="Background"
+              fill
+              unoptimized
+              className="object-cover w-full h-full"
+            />
+          </div>
+
+          {/* Top Header */}
+          <div className="text-center max-w-[600px] mb-4 sm:mb-5">
+            <span className="font-inter font-bold text-white text-[12px] sm:text-[13px] tracking-[0.14em] uppercase block mb-2 sm:mb-2.5">
+              YOUR NEXT CRAVING STARTS HERE
+            </span>
+            <h2 className="font-inter font-bold text-white text-[30px] sm:text-[40px] leading-[1.1] tracking-tight block">
+              Get on the List (it’s free)
+            </h2>
+          </div>
+
+          {/* Center Packaging Pouch on Mobile (pack.png) */}
+          <div className="relative w-full max-w-[240px] sm:max-w-[280px] aspect-[498/640] my-2 sm:my-3">
+            {/* Top-left tick marks */}
+            <div className="absolute -top-3 -left-4 pointer-events-none z-20">
+              <svg width="34" height="30" viewBox="0 0 40 36" fill="none">
+                <line x1="8" y1="26" x2="22" y2="6" stroke="#FFDE6E" strokeWidth="3" strokeLinecap="round" />
+                <line x1="22" y1="30" x2="36" y2="10" stroke="#FFDE6E" strokeWidth="3" strokeLinecap="round" />
+              </svg>
+            </div>
+            {/* Bottom-right tick mark */}
+            <div className="absolute -bottom-2 -right-4 pointer-events-none z-20">
+              <svg width="28" height="24" viewBox="0 0 34 28" fill="none">
+                <line x1="6" y1="6" x2="28" y2="22" stroke="#FFDE6E" strokeWidth="3" strokeLinecap="round" />
+              </svg>
+            </div>
+            <Image
+              src="/pack.png"
+              alt="Laphing Packaging Pouch"
+              fill
+              priority
+              className="object-contain filter drop-shadow-[0_15px_30px_rgba(0,0,0,0.35)]"
+              sizes="(max-width: 768px) 240px, 280px"
+            />
+          </div>
+
+          {/* Offers Container */}
+          <div className="w-full max-w-[500px] flex flex-col items-center text-center mt-2 sm:mt-3">
+            
+            {/* 20% OFF */}
+            <div className="mb-4 sm:mb-5">
+              <span className="font-inter font-black text-[#FFDE6E] text-[52px] sm:text-[64px] leading-none tracking-tight block mb-1.5">
+                20% OFF
+              </span>
+              <p className="font-inter font-medium text-white text-[15px] sm:text-[17px] block">
+                Join the waitlist, save when you pre-order
+              </p>
+            </div>
+
+            {/* CTA Button */}
+            <button
+              onClick={() => openAuthModal("signup")}
+              type="button"
+              className="inline-flex items-center gap-2.5 bg-[#FFDE6E] hover:bg-[#FFE58A] text-[#81191B] font-inter font-black text-[14px] tracking-wide uppercase px-7 py-3 rounded-full shadow-[0_4px_16px_rgba(0,0,0,0.25)] hover:scale-105 active:scale-95 transition-all duration-200 mb-4 sm:mb-5 cursor-pointer"
+            >
+              <span>JOIN THE WAITLIST</span>
+              <span className="text-[17px] font-bold leading-none">&rarr;</span>
+            </button>
+
+            {/* Offer Subtext & Divider Line */}
+            <div className="w-full max-w-[340px] mb-4 sm:mb-5">
+              <p className="font-inter font-bold text-white text-[14px] sm:text-[15px] tracking-tight mb-2">
+                Get up to 30% off on pre-orders
+              </p>
+              <div className="w-full h-[1.5px] bg-white/35" />
+            </div>
+
+            {/* +10% OFF */}
+            <div>
+              <span className="font-inter font-black text-[#FFDE6E] text-[52px] sm:text-[64px] leading-none tracking-tight block mb-1.5">
+                +10% OFF
+              </span>
+              <p className="font-inter font-medium text-white text-[15px] sm:text-[17px] block">
+                Share your referral code with 2 friends.
+              </p>
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      {/* ================= SECTION 4: THE PEOPLE BEHIND THE CHAOS ================= */}
+      <section className="relative w-full bg-[#FFDD6E] text-[#81191B] py-14 sm:py-16 md:py-20 lg:py-24 px-6 sm:px-10 md:px-14 lg:px-20 overflow-hidden select-none">
+        <div className="w-full max-w-[1140px] mx-auto flex flex-col justify-between">
+          
+          {/* Header Info - Left-aligned */}
+          <div className="w-full text-left mb-10 sm:mb-12 md:mb-14">
+            {/* Eyebrow */}
+            <span className="font-inter font-bold text-[#81191B] text-[13px] sm:text-[14px] md:text-[15px] tracking-[0.02em] block mb-2 sm:mb-2.5">
+              Crafted with intense love for spice
+            </span>
+
+            {/* Main Headline */}
+            <h2 className="font-inter font-black text-[#81191B] text-[40px] sm:text-[52px] md:text-[64px] lg:text-[74px] leading-[0.93] tracking-tight uppercase block">
+              THE PEOPLE<br />
+              BEHIND THE CHAOS
+            </h2>
+          </div>
+
+          {/* Polaroids Display Stage */}
+          <div className="relative flex flex-col md:flex-row items-center justify-center gap-8 sm:gap-10 md:gap-12 lg:gap-16 w-full my-auto py-4">
+            
+            {/* Hand-drawn connecting arrow: Centered between Card 1 and Card 2 */}
+            <div className="hidden md:block absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 z-20 pointer-events-none">
+              <svg
+                width="110"
+                height="48"
+                viewBox="0 0 110 48"
+                fill="none"
+                className="w-[85px] sm:w-[95px] md:w-[105px] lg:w-[115px] h-auto text-[#81191B]"
+              >
+                {/* Playful curved arrow */}
+                <path
+                  d="M 8 28 C 35 12, 75 12, 100 24"
+                  stroke="currentColor"
+                  strokeWidth="3.2"
+                  strokeLinecap="round"
+                  fill="none"
+                />
+                {/* Directional Arrowhead */}
+                <path
+                  d="M 84 30 L 100 24 L 90 12"
+                  stroke="currentColor"
+                  strokeWidth="3.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  fill="none"
+                />
+              </svg>
+            </div>
+
+            {/* Left Polaroid */}
+            <div className="relative w-full max-w-[340px] sm:max-w-[390px] md:max-w-[440px] lg:max-w-[465px] bg-[#FFF5DB] border-[1.5px] border-[#81191B] rounded-[6px] p-4 sm:p-5 pb-6 sm:pb-7 shadow-[0_12px_28px_rgba(129,25,27,0.12)] transition-transform duration-300 hover:scale-[1.02] cursor-pointer rotate-[-3.5deg]">
+              {/* Photo Area */}
+              <div className="relative w-full aspect-[4/3.8] bg-[#E7D5B7] border border-[#81191B]/40 flex flex-col items-center justify-center p-4">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#81191B" strokeWidth="2.2" strokeLinecap="round">
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                <span className="font-inter font-bold text-[#81191B] text-[11px] sm:text-[12px] md:text-[13px] tracking-wider uppercase mt-2.5 text-center">
+                  FOUNDER PHOTO / VIDEO
+                </span>
+              </div>
+              {/* Caption */}
+              <p className="font-inter font-bold text-[#81191B] text-[17px] sm:text-[19px] md:text-[20px] mt-4 sm:mt-5 text-left leading-tight">
+                Meet the flavour makers.
+              </p>
+            </div>
+
+            {/* Right Polaroid */}
+            <div className="relative w-full max-w-[340px] sm:max-w-[390px] md:max-w-[440px] lg:max-w-[465px] bg-[#FFF5DB] border-[1.5px] border-[#81191B] rounded-[6px] p-4 sm:p-5 pb-6 sm:pb-7 shadow-[0_12px_28px_rgba(129,25,27,0.12)] transition-transform duration-300 hover:scale-[1.02] cursor-pointer rotate-[3deg]">
+              {/* Photo Area */}
+              <div className="relative w-full aspect-[4/3.8] bg-[#E7D5B7] border border-[#81191B]/40 flex flex-col items-center justify-center p-4">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#81191B" strokeWidth="2.2" strokeLinecap="round">
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                <span className="font-inter font-bold text-[#81191B] text-[11px] sm:text-[12px] md:text-[13px] tracking-wider uppercase mt-2.5 text-center">
+                  BEHIND THE SCENES
+                </span>
+              </div>
+              {/* Caption */}
+              <p className="font-inter font-bold text-[#81191B] text-[17px] sm:text-[19px] md:text-[20px] mt-4 sm:mt-5 text-left leading-tight">
+                A little chaos. A lot of flavour.
+              </p>
+            </div>
+
+          </div>
+
+          {/* Centered Sign-off */}
+          <div className="relative w-full pt-8 sm:pt-10 md:pt-12 flex items-center justify-center">
+            {/* Bottom Centered Text */}
+            <p className="font-inter font-medium text-[#81191B] text-[14px] sm:text-[15px] md:text-[16px] text-center">
+              From our kitchen to your next craving.
+            </p>
+          </div>
+
+        </div>
+      </section>
+
+      {/* ================= FOOTER ================= */}
+      <Footer />
     </div>
   );
 }

@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
-import { Inter, Anton, Bebas_Neue } from "next/font/google";
+import { Inter, Anton, Bebas_Neue, Slackey } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
+import { AuthProvider } from "@/context/AuthContext";
+import AuthModal from "@/components/AuthModal";
+import ReferModal from "@/components/ReferModal";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -19,9 +23,15 @@ const bebas = Bebas_Neue({
   subsets: ["latin"],
 });
 
+const slackey = Slackey({
+  weight: "400",
+  variable: "--font-slackey",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
-  title: "The Laphing Co.",
-  description: "Delicious Laphing ready in 7 minutes",
+  title: "de Laphing co.",
+  description: "Delicious Laphing ready in 5 minutes",
 };
 
 export default function RootLayout({
@@ -32,10 +42,16 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${anton.variable} ${bebas.variable} min-h-screen antialiased`}
+      className={`${inter.variable} ${anton.variable} ${bebas.variable} ${slackey.variable} min-h-screen antialiased`}
     >
       <body className="min-h-screen flex flex-col bg-black text-white">
-        {children}
+        <AuthProvider>
+          {children}
+          <Suspense fallback={null}>
+            <AuthModal />
+          </Suspense>
+          <ReferModal />
+        </AuthProvider>
       </body>
     </html>
   );

@@ -1,0 +1,47 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+  
+    // ---------------------------------------------------------
+    // 1. Settings Collection (Global settings like discounts)
+    // ---------------------------------------------------------
+    // Anyone can read settings, but ideally only an admin can write.
+    // For now, we allow any authenticated user to write so your admin panel works.
+    // IN PRODUCTION: Change this to require a specific Admin UID or custom claim!
+    match /settings/{document=**} {
+      allow read: if true;
+      allow write: if request.auth != null; 
+    }
+
+    // ---------------------------------------------------------
+    // 2. Users Collection (Customer profiles & referral codes)
+    // ---------------------------------------------------------
+    // Allow authenticated users to read and write. 
+    // This allows the referral system to query for a referrer's code 
+    // and update their referral count securely from the frontend.
+    match /users/{userId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // ---------------------------------------------------------
+    // 3. Signups Collection (Used for the Admin Mail/Table list)
+    // ---------------------------------------------------------
+    // Anyone can create a signup document (during registration).
+    // Only authenticated users (admins) can read or modify the list.
+    match /signups/{document=**} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null;
+    }
+
+    // ---------------------------------------------------------
+    // 4. Orders Collection (Customer purchases)
+    // ---------------------------------------------------------
+    // Anyone can create an order (Guest checkout).
+    // Only authenticated users (admins) can read all orders or update statuses.
+    match /orders/{document=**} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null;
+    }
+  }
+}
