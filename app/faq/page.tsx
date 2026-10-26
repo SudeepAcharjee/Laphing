@@ -165,11 +165,11 @@ export default function FAQPage() {
             </div>
 
             <a
-              href="mailto:support@thelaphingco.com"
+              href="mailto:delaphingcompany@gmail.com"
               className="inline-flex items-center gap-2 bg-[#FFDE59] hover:bg-[#FFE58A] text-[#741117] font-inter font-bold text-xs sm:text-sm uppercase tracking-wider px-5 py-2.5 rounded-full transition-all active:scale-95 shadow-sm"
             >
               <Mail className="w-4 h-4" />
-              <span>support@thelaphingco.com</span>
+              <span>delaphingcompany@gmail.com</span>
             </a>
           </div>
         </div>

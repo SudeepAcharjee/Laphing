@@ -99,17 +99,17 @@ export default function PrivacyPolicyPage() {
               6. Your Privacy Rights
             </h2>
             <p className="text-white/85">
-              You can view and edit your profile details at any time from your account page. If you would like your account, order history, or contact details completely removed from our system, simply email us at <strong className="text-white">support@thelaphingco.com</strong>.
+              You can view and edit your profile details at any time from your account page. If you would like your account, order history, or contact details completely removed from our system, simply email us at <strong className="text-white">delaphingcompany@gmail.com</strong>.
             </p>
             
             <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs sm:text-sm text-white/75 bg-white/5 p-4 rounded-2xl border border-white/10">
               <span>Have privacy questions or request data deletion?</span>
               <a
-                href="mailto:support@thelaphingco.com"
+                href="mailto:delaphingcompany@gmail.com"
                 className="inline-flex items-center gap-1.5 text-[#FFDE59] font-bold hover:underline"
               >
                 <Mail className="w-4 h-4" />
-                <span>support@thelaphingco.com</span>
+                <span>delaphingcompany@gmail.com</span>
               </a>
             </div>
           </section>

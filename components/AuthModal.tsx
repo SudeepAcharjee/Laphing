@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 import {
   doc,
@@ -24,12 +25,12 @@ import {
   User,
   Mail,
   Lock,
-  Phone,
   Gift,
   X,
   Loader2,
   CheckCircle2,
   AlertCircle,
+  ArrowLeft,
 } from "lucide-react";
 
 export default function AuthModal() {
@@ -42,7 +43,7 @@ export default function AuthModal() {
   } = useAuth();
   const searchParams = useSearchParams();
 
-  const [mode, setMode] = useState<"signup" | "login">("signup");
+  const [mode, setMode] = useState<"signup" | "login" | "forgot">("signup");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -75,6 +76,8 @@ export default function AuthModal() {
       openAuthModal("login");
     } else if (authParam === "signup") {
       openAuthModal("signup");
+    } else if (authParam === "forgot") {
+      openAuthModal("forgot");
     }
   }, [searchParams]);
 
@@ -242,6 +245,33 @@ export default function AuthModal() {
     }
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.email.trim()) {
+      setError("Please enter your registered email address.");
+      return;
+    }
+    setLoading(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      await sendPasswordResetEmail(auth, formData.email.trim());
+      setSuccess("Password reset link sent! Please check your email inbox and spam folder.");
+    } catch (err: any) {
+      console.error("Forgot password error:", err);
+      if (err.code === "auth/user-not-found") {
+        setError("No account found with this email address.");
+      } else if (err.code === "auth/invalid-email") {
+        setError("Please enter a valid email address.");
+      } else {
+        setError(err.message || "Failed to send reset email. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div
       role="dialog"
@@ -259,7 +289,7 @@ export default function AuthModal() {
           onClick={closeAuthModal}
           type="button"
           aria-label="Close dialog"
-          className="absolute top-4 right-4 sm:top-5 sm:right-5 w-9 h-9 flex items-center justify-center rounded-full bg-[#81191B]/10 hover:bg-[#81191B] text-[#81191B] hover:text-[#FFDE59] transition-all duration-200"
+          className="absolute top-4 right-4 sm:top-5 sm:right-5 w-9 h-9 flex items-center justify-center rounded-full bg-[#81191B]/10 hover:bg-[#81191B] text-[#81191B] hover:text-[#FFDE59] transition-all duration-200 cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
@@ -267,48 +297,71 @@ export default function AuthModal() {
         {/* Modal Header */}
         <div className="flex flex-col items-center text-center mb-5 pt-1">
           <h3 className="font-inter font-black text-[#81191B] text-[24px] sm:text-[27px] leading-tight uppercase tracking-tight">
-            {mode === "signup" ? "Get On The List" : "Welcome Back"}
+            {mode === "signup"
+              ? "Get On The List"
+              : mode === "forgot"
+              ? "Reset Password"
+              : "Welcome Back"}
           </h3>
           <p className="font-inter font-medium text-[#741117]/85 text-[13px] sm:text-[14px] mt-1 max-w-[320px] leading-snug">
             {mode === "signup"
               ? "Sign up for 20% off at launch & exclusive spice drops."
+              : mode === "forgot"
+              ? "Enter your registered email and we will send a password reset link."
               : "Log in to check your referrals and pre-order perks."}
           </p>
         </div>
 
-        {/* Tab Switcher: Sign Up / Log In */}
-        <div className="flex p-1 bg-[#81191B]/15 rounded-full mb-5 max-w-[280px] mx-auto">
-          <button
-            type="button"
-            onClick={() => {
-              setMode("signup");
-              setError("");
-              setSuccess("");
-            }}
-            className={`flex-1 py-1.5 text-[13px] sm:text-[14px] font-inter font-bold rounded-full transition-all duration-200 uppercase tracking-wide ${
-              mode === "signup"
-                ? "bg-[#81191B] text-[#FFDE59] shadow-sm"
-                : "text-[#81191B] hover:text-black"
-            }`}
-          >
-            Sign Up
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setMode("login");
-              setError("");
-              setSuccess("");
-            }}
-            className={`flex-1 py-1.5 text-[13px] sm:text-[14px] font-inter font-bold rounded-full transition-all duration-200 uppercase tracking-wide ${
-              mode === "login"
-                ? "bg-[#81191B] text-[#FFDE59] shadow-sm"
-                : "text-[#81191B] hover:text-black"
-            }`}
-          >
-            Log In
-          </button>
-        </div>
+        {/* Tab Switcher OR Back Button */}
+        {mode === "forgot" ? (
+          <div className="flex justify-center mb-5">
+            <button
+              type="button"
+              onClick={() => {
+                setMode("login");
+                setError("");
+                setSuccess("");
+              }}
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#81191B] hover:text-black bg-[#81191B]/10 hover:bg-[#81191B]/20 px-3.5 py-1.5 rounded-full transition-all cursor-pointer"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back to Log In</span>
+            </button>
+          </div>
+        ) : (
+          <div className="flex p-1 bg-[#81191B]/15 rounded-full mb-5 max-w-[280px] mx-auto">
+            <button
+              type="button"
+              onClick={() => {
+                setMode("signup");
+                setError("");
+                setSuccess("");
+              }}
+              className={`flex-1 py-1.5 text-[13px] sm:text-[14px] font-inter font-bold rounded-full transition-all duration-200 uppercase tracking-wide ${
+                mode === "signup"
+                  ? "bg-[#81191B] text-[#FFDE59] shadow-sm"
+                  : "text-[#81191B] hover:text-black cursor-pointer"
+              }`}
+            >
+              Sign Up
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setMode("login");
+                setError("");
+                setSuccess("");
+              }}
+              className={`flex-1 py-1.5 text-[13px] sm:text-[14px] font-inter font-bold rounded-full transition-all duration-200 uppercase tracking-wide ${
+                mode === "login"
+                  ? "bg-[#81191B] text-[#FFDE59] shadow-sm"
+                  : "text-[#81191B] hover:text-black cursor-pointer"
+              }`}
+            >
+              Log In
+            </button>
+          </div>
+        )}
 
         {/* Success Alert */}
         {success && (
@@ -328,7 +381,13 @@ export default function AuthModal() {
 
         {/* Form */}
         <form
-          onSubmit={mode === "signup" ? handleSignup : handleLogin}
+          onSubmit={
+            mode === "signup"
+              ? handleSignup
+              : mode === "forgot"
+              ? handleForgotPassword
+              : handleLogin
+          }
           className="space-y-3"
         >
           {/* Sign Up Fields */}
@@ -349,7 +408,7 @@ export default function AuthModal() {
             </div>
           )}
 
-          {/* Email Field (Both) */}
+          {/* Email Field (All Modes) */}
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
               <Mail className="h-4 w-4 text-[#81191B]/60" />
@@ -365,37 +424,41 @@ export default function AuthModal() {
             />
           </div>
 
-          {/* Password Field (Both) */}
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-              <Lock className="h-4 w-4 text-[#81191B]/60" />
-            </div>
-            <input
-              type="password"
-              name="password"
-              required
-              minLength={6}
-              value={formData.password}
-              onChange={handleChange}
-              placeholder={mode === "signup" ? "Password (min 6 chars)" : "Password"}
-              className="w-full pl-10 pr-3.5 py-2.5 bg-[#FFFBF0] border border-[#81191B]/30 focus:border-[#81191B] text-[#580F13] placeholder-[#81191B]/50 rounded-xl text-[14px] font-medium outline-none transition-all shadow-inner"
-            />
-          </div>
-
-          {/* Phone Field (Sign Up Only) */}
-          {mode === "signup" && (
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                <Phone className="h-4 w-4 text-[#81191B]/60" />
+          {/* Password Field (Signup and Login Only) */}
+          {mode !== "forgot" && (
+            <div className="space-y-1">
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                  <Lock className="h-4 w-4 text-[#81191B]/60" />
+                </div>
+                <input
+                  type="password"
+                  name="password"
+                  required
+                  minLength={6}
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder={mode === "signup" ? "Enter a New password" : "Password"}
+                  className="w-full pl-10 pr-3.5 py-2.5 bg-[#FFFBF0] border border-[#81191B]/30 focus:border-[#81191B] text-[#580F13] placeholder-[#81191B]/50 rounded-xl text-[14px] font-medium outline-none transition-all shadow-inner"
+                />
               </div>
-              <input
-                type="tel"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                placeholder="Phone Number (for pre-order SMS)"
-                className="w-full pl-10 pr-3.5 py-2.5 bg-[#FFFBF0] border border-[#81191B]/30 focus:border-[#81191B] text-[#580F13] placeholder-[#81191B]/50 rounded-xl text-[14px] font-medium outline-none transition-all shadow-inner"
-              />
+
+              {/* Forgot Password Link in Login Mode */}
+              {mode === "login" && (
+                <div className="flex justify-end pt-0.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMode("forgot");
+                      setError("");
+                      setSuccess("");
+                    }}
+                    className="text-[12px] font-bold text-[#81191B]/90 hover:text-[#81191B] hover:underline cursor-pointer transition-colors"
+                  >
+                    Forgot Password?
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
@@ -440,7 +503,7 @@ export default function AuthModal() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#81191B] hover:bg-[#681315] text-[#FFDE59] font-inter font-black text-[15px] tracking-wider uppercase py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed mt-3"
+            className="w-full bg-[#81191B] hover:bg-[#681315] text-[#FFDE59] font-inter font-black text-[15px] tracking-wider uppercase py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed mt-3 cursor-pointer"
           >
             {loading ? (
               <>
@@ -449,6 +512,8 @@ export default function AuthModal() {
               </>
             ) : mode === "signup" ? (
               "Sign Up & Claim 20% Off"
+            ) : mode === "forgot" ? (
+              "Send Reset Link"
             ) : (
               "Log In"
             )}
@@ -467,9 +532,24 @@ export default function AuthModal() {
                   setError("");
                   setSuccess("");
                 }}
-                className="font-bold underline text-[#81191B] hover:text-black transition-colors"
+                className="font-bold underline text-[#81191B] hover:text-black transition-colors cursor-pointer"
               >
                 Log in here
+              </button>
+            </p>
+          ) : mode === "forgot" ? (
+            <p className="text-[13px] text-[#741117] font-medium">
+              Remember your password?{" "}
+              <button
+                type="button"
+                onClick={() => {
+                  setMode("login");
+                  setError("");
+                  setSuccess("");
+                }}
+                className="font-bold underline text-[#81191B] hover:text-black transition-colors cursor-pointer"
+              >
+                Back to Log In
               </button>
             </p>
           ) : (
@@ -482,7 +562,7 @@ export default function AuthModal() {
                   setError("");
                   setSuccess("");
                 }}
-                className="font-bold underline text-[#81191B] hover:text-black transition-colors"
+                className="font-bold underline text-[#81191B] hover:text-black transition-colors cursor-pointer"
               >
                 Sign up for 20% off
               </button>

@@ -10,8 +10,8 @@ interface AuthContextType {
   userData: any | null;
   loading: boolean;
   isAuthModalOpen: boolean;
-  authModalMode: "signup" | "login";
-  openAuthModal: (mode?: "signup" | "login") => void;
+  authModalMode: "signup" | "login" | "forgot";
+  openAuthModal: (mode?: "signup" | "login" | "forgot") => void;
   closeAuthModal: () => void;
   isReferModalOpen: boolean;
   openReferModal: () => void;
@@ -40,7 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [userData, setUserData] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [authModalMode, setAuthModalMode] = useState<"signup" | "login">("signup");
+  const [authModalMode, setAuthModalMode] = useState<"signup" | "login" | "forgot">("signup");
   const [isReferModalOpen, setIsReferModalOpen] = useState(false);
 
   const fetchUserData = async (uid: string) => {
@@ -70,7 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => unsubscribe();
   }, []);
 
-  const openAuthModal = (mode: "signup" | "login" = "signup") => {
+  const openAuthModal = (mode: "signup" | "login" | "forgot" = "signup") => {
     setAuthModalMode(mode);
     setIsAuthModalOpen(true);
   };

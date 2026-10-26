@@ -115,11 +115,11 @@ export default function TermsOfServicePage() {
             <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs sm:text-sm text-white/75 bg-white/5 p-4 rounded-2xl border border-white/10">
               <span>Questions regarding these terms?</span>
               <a
-                href="mailto:support@thelaphingco.com"
+                href="mailto:delaphingcompany@gmail.com"
                 className="inline-flex items-center gap-1.5 text-[#FFDE59] font-bold hover:underline"
               >
                 <Mail className="w-4 h-4" />
-                <span>support@thelaphingco.com</span>
+                <span>delaphingcompany@gmail.com</span>
               </a>
             </div>
           </section>

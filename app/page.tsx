@@ -30,10 +30,10 @@ export default function Home() {
 
       {/* ================= CALLOUT BANNER ================= */}
       <section className="relative w-full bg-[#6B1319] select-none border-t border-black/10">
-        <div className="w-full max-w-[1440px] mx-auto px-6 sm:px-10 md:px-16 lg:px-20 py-7 sm:py-9 md:py-10 flex flex-col md:flex-row items-center justify-between gap-5 sm:gap-6">
+        <div className="w-full max-w-[1440px] mx-auto px-3 sm:px-10 md:px-16 lg:px-20 py-6 sm:py-8 md:py-10 flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6">
           
-          {/* Headline */}
-          <h2 className="font-inter font-black text-white text-[24px] sm:text-[28px] md:text-[34px] lg:text-[40px] tracking-tight uppercase text-center md:text-left leading-tight drop-shadow-sm">
+          {/* Headline - strictly 1 line */}
+          <h2 className="font-inter font-black text-white text-[15px] min-[360px]:text-[17px] min-[390px]:text-[19px] sm:text-[26px] md:text-[32px] lg:text-[38px] xl:text-[40px] tracking-tight uppercase text-center md:text-left leading-tight drop-shadow-sm whitespace-nowrap">
             CRAVING LAPHING? WE GET IT.
           </h2>
 
@@ -41,7 +41,7 @@ export default function Home() {
           <button
             onClick={() => openAuthModal("signup")}
             type="button"
-            className="shrink-0 inline-flex items-center justify-center bg-[#FFDE59] hover:bg-[#FFE58A] text-[#741117] font-inter font-bold text-[16px] sm:text-[18px] tracking-wide px-8 sm:px-10 py-3.5 sm:py-4 rounded-full shadow-[0_4px_14px_rgba(0,0,0,0.25)] hover:shadow-[0_6px_20px_rgba(255,222,89,0.35)] transition-all duration-200 hover:scale-[1.03] active:scale-[0.98] text-center cursor-pointer"
+            className="w-auto shrink-0 inline-flex items-center justify-center bg-[#FFDE59] hover:bg-[#FFE58A] text-[#741117] font-inter font-bold text-[14px] sm:text-[18px] tracking-wide px-7 sm:px-10 py-3 sm:py-4 rounded-full shadow-[0_4px_14px_rgba(0,0,0,0.25)] hover:shadow-[0_6px_20px_rgba(255,222,89,0.35)] transition-all duration-200 hover:scale-[1.03] active:scale-[0.98] text-center cursor-pointer"
           >
             Join the waitlist
           </button>
@@ -357,45 +357,45 @@ export default function Home() {
         </div>
 
         {/* ================= MOBILE STACK (< 768px) ================= */}
-        <div className="md:hidden relative z-10 w-full max-w-[500px] mx-auto px-5 py-14 flex flex-col items-center">
+        <div className="md:hidden relative z-10 w-full max-w-[500px] mx-auto px-4 xs:px-6 py-10 sm:py-14 flex flex-col items-center">
           
           {/* Mobile Header */}
-          <div className="text-center mb-8">
-            <span className="font-inter font-bold text-[#81191B] text-[13px] tracking-widest uppercase block mb-2">
+          <div className="text-center mb-6 sm:mb-8 max-w-sm sm:max-w-none">
+            <span className="font-inter font-bold text-[#81191B] text-[11px] sm:text-[13px] tracking-widest uppercase block mb-1.5 sm:mb-2">
               WHAT GOES INTO THE GOOD STUFF
             </span>
-            <h2 className="font-inter font-black text-[#81191B] text-[34px] sm:text-[42px] leading-[1.08] tracking-tight block mb-2.5">
+            <h2 className="font-inter font-black text-[#81191B] text-[26px] xs:text-[32px] sm:text-[42px] leading-[1.08] tracking-tight block mb-2 sm:mb-2.5">
               What’s inside this Baddie?
             </h2>
-            <p className="font-inter font-medium text-[#81191B] text-[15px] sm:text-[16px] block">
+            <p className="font-inter font-medium text-[#81191B] text-[14px] sm:text-[16px] block">
               Six little personalities. One big craving.
             </p>
           </div>
 
           {/* Center Pouch */}
-          <div className="relative w-[240px] sm:w-[280px] aspect-[470/622] rotate-[-3deg] drop-shadow-[0_16px_28px_rgba(129,25,27,0.14)] mb-2">
+          <div className="relative w-[200px] xs:w-[240px] sm:w-[280px] aspect-[470/622] rotate-[-3deg] drop-shadow-[0_16px_28px_rgba(129,25,27,0.14)] mb-1">
             <Image
               src="/about/center.png"
               alt="Laphing Packaging Pouch"
               fill
               priority
               className="object-contain"
-              sizes="280px"
+              sizes="(max-width: 640px) 240px, 280px"
             />
           </div>
 
           {/* Mobile Oval Shadow */}
-          <div className="w-[230px] sm:w-[260px] h-[40px] rounded-[50%] bg-[#81191B]/15 -mt-6 mb-3 pointer-events-none" />
+          <div className="w-[190px] xs:w-[230px] sm:w-[260px] h-[34px] sm:h-[40px] rounded-[50%] bg-[#81191B]/15 -mt-5 mb-2.5 pointer-events-none" />
 
           {/* Mobile Badge: Ready in 5 mins! (Compact, Rotated Clockwise 4.5deg) */}
-          <div className="px-6 py-2.5 rounded-xl bg-[#FFFDF6] border border-[#EFE5D5] shadow-[0_6px_18px_rgba(130,80,60,0.08)] mb-8 rotate-[4.5deg]">
-            <span className="font-inter font-bold text-[#81191B] text-[17px] sm:text-[19px] tracking-normal block leading-none">
+          <div className="px-5 py-2 sm:px-6 sm:py-2.5 rounded-xl bg-[#FFFDF6] border border-[#EFE5D5] shadow-[0_6px_18px_rgba(130,80,60,0.08)] mb-6 sm:mb-8 rotate-[4.5deg]">
+            <span className="font-inter font-bold text-[#81191B] text-[15px] sm:text-[19px] tracking-normal block leading-none">
               Ready in 5 mins!
             </span>
           </div>
 
           {/* 6 SVG Mascots Grid on Mobile */}
-          <div className="grid grid-cols-2 gap-4 w-full">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 w-full">
             {[
               { src: "/about/1.svg", alt: "Chilli Sauce" },
               { src: "/about/4.svg", alt: "Wai Wai Noodles" },
@@ -406,9 +406,9 @@ export default function Home() {
             ].map((item, idx) => (
               <div 
                 key={idx}
-                className="relative w-full aspect-square flex items-center justify-center p-2 group transition-transform duration-300 hover:scale-105"
+                className="relative w-full aspect-square flex items-center justify-center p-2 rounded-2xl bg-[#FFFDF6]/40 border border-[#81191B]/10 shadow-[0_4px_12px_rgba(129,25,27,0.04)] transition-transform duration-300 hover:scale-105"
               >
-                <div className="relative w-full h-full max-h-[140px] drop-shadow-[0_4px_12px_rgba(0,0,0,0.06)]">
+                <div className="relative w-full h-full max-h-[120px] xs:max-h-[135px] sm:max-h-[140px] drop-shadow-[0_4px_12px_rgba(0,0,0,0.06)]">
                   <Image
                     src={item.src}
                     alt={item.alt}
@@ -544,40 +544,40 @@ export default function Home() {
         </div>
 
         {/* ================= MOBILE & TABLET STACK (< 1024px) ================= */}
-        <div className="lg:hidden relative z-10 w-full py-12 sm:py-14 px-6 sm:px-10 flex flex-col items-center">
-          {/* Background image covering mobile section */}
-          <div className="absolute inset-0 w-full h-full pointer-events-none -z-10">
+        <div className="lg:hidden relative z-10 w-full py-10 sm:py-14 px-4 xs:px-6 sm:px-10 flex flex-col items-center">
+          {/* Background image covering mobile section - shifted to show only the maroon sunburst rays */}
+          <div className="absolute inset-0 w-full h-full pointer-events-none -z-10 overflow-hidden">
             <Image
               src="/20%25offbg.png"
               alt="Background"
               fill
               unoptimized
-              className="object-cover w-full h-full"
+              className="object-cover object-left sm:object-[15%_center] w-full h-full"
             />
           </div>
 
           {/* Top Header */}
-          <div className="text-center max-w-[600px] mb-4 sm:mb-5">
-            <span className="font-inter font-bold text-white text-[12px] sm:text-[13px] tracking-[0.14em] uppercase block mb-2 sm:mb-2.5">
+          <div className="text-center max-w-[600px] mb-3 sm:mb-5">
+            <span className="font-inter font-bold text-white text-[11px] sm:text-[13px] tracking-[0.14em] uppercase block mb-1.5 sm:mb-2.5">
               YOUR NEXT CRAVING STARTS HERE
             </span>
-            <h2 className="font-inter font-bold text-white text-[30px] sm:text-[40px] leading-[1.1] tracking-tight block">
+            <h2 className="font-inter font-bold text-white text-[26px] xs:text-[32px] sm:text-[40px] leading-[1.1] tracking-tight block">
               Get on the List (it’s free)
             </h2>
           </div>
 
           {/* Center Packaging Pouch on Mobile (pack.png) */}
-          <div className="relative w-full max-w-[240px] sm:max-w-[280px] aspect-[498/640] my-2 sm:my-3">
+          <div className="relative w-full max-w-[200px] xs:max-w-[240px] sm:max-w-[280px] aspect-[498/640] my-2 sm:my-3">
             {/* Top-left tick marks */}
-            <div className="absolute -top-3 -left-4 pointer-events-none z-20">
-              <svg width="34" height="30" viewBox="0 0 40 36" fill="none">
+            <div className="absolute -top-3 -left-3 pointer-events-none z-20">
+              <svg width="30" height="26" viewBox="0 0 40 36" fill="none">
                 <line x1="8" y1="26" x2="22" y2="6" stroke="#FFDE6E" strokeWidth="3" strokeLinecap="round" />
                 <line x1="22" y1="30" x2="36" y2="10" stroke="#FFDE6E" strokeWidth="3" strokeLinecap="round" />
               </svg>
             </div>
             {/* Bottom-right tick mark */}
-            <div className="absolute -bottom-2 -right-4 pointer-events-none z-20">
-              <svg width="28" height="24" viewBox="0 0 34 28" fill="none">
+            <div className="absolute -bottom-2 -right-3 pointer-events-none z-20">
+              <svg width="26" height="22" viewBox="0 0 34 28" fill="none">
                 <line x1="6" y1="6" x2="28" y2="22" stroke="#FFDE6E" strokeWidth="3" strokeLinecap="round" />
               </svg>
             </div>
@@ -587,19 +587,19 @@ export default function Home() {
               fill
               priority
               className="object-contain filter drop-shadow-[0_15px_30px_rgba(0,0,0,0.35)]"
-              sizes="(max-width: 768px) 240px, 280px"
+              sizes="(max-width: 640px) 220px, 280px"
             />
           </div>
 
           {/* Offers Container */}
-          <div className="w-full max-w-[500px] flex flex-col items-center text-center mt-2 sm:mt-3">
+          <div className="w-full max-w-[480px] flex flex-col items-center text-center mt-2 sm:mt-3">
             
             {/* 20% OFF */}
-            <div className="mb-4 sm:mb-5">
-              <span className="font-inter font-black text-[#FFDE6E] text-[52px] sm:text-[64px] leading-none tracking-tight block mb-1.5">
+            <div className="mb-3.5 sm:mb-5">
+              <span className="font-inter font-black text-[#FFDE6E] text-[44px] xs:text-[52px] sm:text-[64px] leading-none tracking-tight block mb-1">
                 20% OFF
               </span>
-              <p className="font-inter font-medium text-white text-[15px] sm:text-[17px] block">
+              <p className="font-inter font-medium text-white text-[14px] xs:text-[15px] sm:text-[17px] block">
                 Join the waitlist, save when you pre-order
               </p>
             </div>
@@ -608,15 +608,15 @@ export default function Home() {
             <button
               onClick={() => openAuthModal("signup")}
               type="button"
-              className="inline-flex items-center gap-2.5 bg-[#FFDE6E] hover:bg-[#FFE58A] text-[#81191B] font-inter font-black text-[14px] tracking-wide uppercase px-7 py-3 rounded-full shadow-[0_4px_16px_rgba(0,0,0,0.25)] hover:scale-105 active:scale-95 transition-all duration-200 mb-4 sm:mb-5 cursor-pointer"
+              className="w-full max-w-[280px] justify-center inline-flex items-center gap-2 bg-[#FFDE6E] hover:bg-[#FFE58A] text-[#81191B] font-inter font-black text-[13px] xs:text-[14px] tracking-wide uppercase px-6 py-3 rounded-full shadow-[0_4px_16px_rgba(0,0,0,0.25)] hover:scale-105 active:scale-95 transition-all duration-200 mb-3.5 sm:mb-5 cursor-pointer"
             >
               <span>JOIN THE WAITLIST</span>
               <span className="text-[17px] font-bold leading-none">&rarr;</span>
             </button>
 
             {/* Offer Subtext & Divider Line */}
-            <div className="w-full max-w-[340px] mb-4 sm:mb-5">
-              <p className="font-inter font-bold text-white text-[14px] sm:text-[15px] tracking-tight mb-2">
+            <div className="w-full max-w-[300px] sm:max-w-[340px] mb-3.5 sm:mb-5">
+              <p className="font-inter font-bold text-white text-[13px] sm:text-[15px] tracking-tight mb-2">
                 Get up to 30% off on pre-orders
               </p>
               <div className="w-full h-[1.5px] bg-white/35" />
@@ -624,10 +624,10 @@ export default function Home() {
 
             {/* +10% OFF */}
             <div>
-              <span className="font-inter font-black text-[#FFDE6E] text-[52px] sm:text-[64px] leading-none tracking-tight block mb-1.5">
+              <span className="font-inter font-black text-[#FFDE6E] text-[44px] xs:text-[52px] sm:text-[64px] leading-none tracking-tight block mb-1">
                 +10% OFF
               </span>
-              <p className="font-inter font-medium text-white text-[15px] sm:text-[17px] block">
+              <p className="font-inter font-medium text-white text-[14px] xs:text-[15px] sm:text-[17px] block">
                 Share your referral code with 2 friends.
               </p>
             </div>
@@ -639,27 +639,27 @@ export default function Home() {
       </section>
 
       {/* ================= SECTION 4: THE PEOPLE BEHIND THE CHAOS ================= */}
-      <section className="relative w-full bg-[#FFDD6E] text-[#81191B] py-14 sm:py-16 md:py-20 lg:py-24 px-6 sm:px-10 md:px-14 lg:px-20 overflow-hidden select-none">
+      <section className="relative w-full bg-[#FFDD6E] text-[#81191B] py-10 sm:py-14 md:py-20 lg:py-24 px-4 xs:px-6 sm:px-10 md:px-14 lg:px-20 overflow-hidden select-none">
         <div className="w-full max-w-[1140px] mx-auto flex flex-col justify-between">
           
           {/* Header Info - Left-aligned */}
-          <div className="w-full text-left mb-10 sm:mb-12 md:mb-14">
+          <div className="w-full text-left mb-8 sm:mb-12 md:mb-14">
             {/* Eyebrow */}
-            <span className="font-inter font-bold text-[#81191B] text-[13px] sm:text-[14px] md:text-[15px] tracking-[0.02em] block mb-2 sm:mb-2.5">
+            <span className="font-inter font-bold text-[#81191B] text-[12px] sm:text-[14px] md:text-[15px] tracking-[0.02em] block mb-1.5 sm:mb-2.5">
               Crafted with intense love for spice
             </span>
 
             {/* Main Headline */}
-            <h2 className="font-inter font-black text-[#81191B] text-[40px] sm:text-[52px] md:text-[64px] lg:text-[74px] leading-[0.93] tracking-tight uppercase block">
+            <h2 className="font-inter font-black text-[#81191B] text-[28px] xs:text-[36px] sm:text-[48px] md:text-[60px] lg:text-[74px] leading-[0.96] tracking-tight uppercase block">
               THE PEOPLE<br />
               BEHIND THE CHAOS
             </h2>
           </div>
 
           {/* Polaroids Display Stage */}
-          <div className="relative flex flex-col md:flex-row items-center justify-center gap-8 sm:gap-10 md:gap-12 lg:gap-16 w-full my-auto py-4">
+          <div className="relative flex flex-col md:flex-row items-center justify-center gap-6 sm:gap-10 md:gap-12 lg:gap-16 w-full my-auto py-2 sm:py-4">
             
-            {/* Hand-drawn connecting arrow: Centered between Card 1 and Card 2 */}
+            {/* Hand-drawn connecting arrow: Centered between Card 1 and Card 2 on Desktop */}
             <div className="hidden md:block absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 z-20 pointer-events-none">
               <svg
                 width="110"
@@ -689,7 +689,7 @@ export default function Home() {
             </div>
 
             {/* Left Polaroid */}
-            <div className="relative w-full max-w-[340px] sm:max-w-[390px] md:max-w-[440px] lg:max-w-[465px] bg-[#FFF5DB] border-[1.5px] border-[#81191B] rounded-[6px] p-4 sm:p-5 pb-6 sm:pb-7 shadow-[0_12px_28px_rgba(129,25,27,0.12)] transition-transform duration-300 hover:scale-[1.02] cursor-pointer rotate-[-3.5deg]">
+            <div className="relative w-full max-w-[290px] xs:max-w-[330px] sm:max-w-[390px] md:max-w-[440px] lg:max-w-[465px] bg-[#FFF5DB] border-[1.5px] border-[#81191B] rounded-[6px] p-3.5 xs:p-4 sm:p-5 pb-5 sm:pb-7 shadow-[0_12px_28px_rgba(129,25,27,0.12)] transition-transform duration-300 hover:scale-[1.02] cursor-pointer rotate-[-1.5deg] md:rotate-[-3.5deg]">
               {/* Photo Area */}
               <div className="relative w-full aspect-[4/3.8] bg-[#E7D5B7] border border-[#81191B]/40 flex flex-col items-center justify-center p-4">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#81191B" strokeWidth="2.2" strokeLinecap="round">
@@ -701,13 +701,40 @@ export default function Home() {
                 </span>
               </div>
               {/* Caption */}
-              <p className="font-inter font-bold text-[#81191B] text-[17px] sm:text-[19px] md:text-[20px] mt-4 sm:mt-5 text-left leading-tight">
+              <p className="font-inter font-bold text-[#81191B] text-[16px] xs:text-[17px] sm:text-[19px] md:text-[20px] mt-3.5 sm:mt-5 text-left leading-tight">
                 Meet the flavour makers.
               </p>
             </div>
 
+            {/* Hand-drawn connecting arrow: Downward on Mobile */}
+            <div className="flex md:hidden items-center justify-center -my-2 sm:-my-3 pointer-events-none text-[#81191B]">
+              <svg
+                width="36"
+                height="44"
+                viewBox="0 0 36 44"
+                fill="none"
+                className="w-7 h-auto"
+              >
+                <path
+                  d="M 18 4 C 24 16, 12 24, 18 36"
+                  stroke="currentColor"
+                  strokeWidth="2.8"
+                  strokeLinecap="round"
+                  fill="none"
+                />
+                <path
+                  d="M 12 28 L 18 37 L 24 28"
+                  stroke="currentColor"
+                  strokeWidth="2.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  fill="none"
+                />
+              </svg>
+            </div>
+
             {/* Right Polaroid */}
-            <div className="relative w-full max-w-[340px] sm:max-w-[390px] md:max-w-[440px] lg:max-w-[465px] bg-[#FFF5DB] border-[1.5px] border-[#81191B] rounded-[6px] p-4 sm:p-5 pb-6 sm:pb-7 shadow-[0_12px_28px_rgba(129,25,27,0.12)] transition-transform duration-300 hover:scale-[1.02] cursor-pointer rotate-[3deg]">
+            <div className="relative w-full max-w-[290px] xs:max-w-[330px] sm:max-w-[390px] md:max-w-[440px] lg:max-w-[465px] bg-[#FFF5DB] border-[1.5px] border-[#81191B] rounded-[6px] p-3.5 xs:p-4 sm:p-5 pb-5 sm:pb-7 shadow-[0_12px_28px_rgba(129,25,27,0.12)] transition-transform duration-300 hover:scale-[1.02] cursor-pointer rotate-[1.5deg] md:rotate-[3deg]">
               {/* Photo Area */}
               <div className="relative w-full aspect-[4/3.8] bg-[#E7D5B7] border border-[#81191B]/40 flex flex-col items-center justify-center p-4">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#81191B" strokeWidth="2.2" strokeLinecap="round">
@@ -719,7 +746,7 @@ export default function Home() {
                 </span>
               </div>
               {/* Caption */}
-              <p className="font-inter font-bold text-[#81191B] text-[17px] sm:text-[19px] md:text-[20px] mt-4 sm:mt-5 text-left leading-tight">
+              <p className="font-inter font-bold text-[#81191B] text-[16px] xs:text-[17px] sm:text-[19px] md:text-[20px] mt-3.5 sm:mt-5 text-left leading-tight">
                 A little chaos. A lot of flavour.
               </p>
             </div>
@@ -727,9 +754,9 @@ export default function Home() {
           </div>
 
           {/* Centered Sign-off */}
-          <div className="relative w-full pt-8 sm:pt-10 md:pt-12 flex items-center justify-center">
+          <div className="relative w-full pt-6 sm:pt-10 md:pt-12 flex items-center justify-center">
             {/* Bottom Centered Text */}
-            <p className="font-inter font-medium text-[#81191B] text-[14px] sm:text-[15px] md:text-[16px] text-center">
+            <p className="font-inter font-medium text-[#81191B] text-[13px] sm:text-[15px] md:text-[16px] text-center">
               From our kitchen to your next craving.
             </p>
           </div>

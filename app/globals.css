@@ -6,6 +6,7 @@
 }
 
 @theme inline {
+  --breakpoint-xs: 400px;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-inter);
@@ -28,10 +29,13 @@
   }
 }
 
+html,
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-inter), Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 @keyframes mascot-in {

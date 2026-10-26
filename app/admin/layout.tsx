@@ -58,7 +58,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   };
 
   useEffect(() => {
-    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || "admin@gmail.com";
+    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || "delaphingcompany@gmail.com";
     
     const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
       if (!currentUser && pathname !== "/admin/login") {
