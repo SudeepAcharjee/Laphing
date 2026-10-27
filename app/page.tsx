@@ -996,8 +996,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ================= SECTION 5: LAPHING GUIDE (SEO / AEO / GEO) ================= */}
-      <LaphingGuideSection />
+   
     </main>
 
       {/* ================= FOOTER ================= */}
