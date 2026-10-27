@@ -53,7 +53,7 @@ const FAQ_DATA: FAQItem[] = [
     id: "waitlist-discount",
     category: "Orders & Waitlist",
     question: "How do the 20% OFF and +10% referral discounts work?",
-    answer: "By signing up for our early waitlist, you automatically lock in a flat 20% discount on your launch order. Once signed up, you receive a unique referral link from your profile. For every friend who signs up with your link, you get an additional +10% OFF stacked on your order!",
+    answer: "By signing up for our early waitlist, you automatically unlock a flat 20% discount on your pre-order. You can also share your referral code with up to 2 friends. When 2 friends sign up using your code, you unlock an extra +10% OFF, giving you a total maximum discount of 30%!",
   },
   {
     id: "delivery-timeline",

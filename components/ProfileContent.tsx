@@ -18,13 +18,16 @@ import {
   Package,
   Edit2,
   ShoppingBag,
-  ArrowRight
+  ArrowRight,
+  Gift
 } from "lucide-react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { useAuth } from "@/context/AuthContext";
 
 export default function ProfileContent() {
+  const { openReferModal } = useAuth();
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const [userData, setUserData] = useState<any>(null);
@@ -329,11 +332,11 @@ export default function ProfileContent() {
                 </div>
               </div>
 
-              {/* Quick Perks: Discount Badge & Referral Code */}
-              <div className="flex flex-wrap sm:flex-nowrap items-center gap-3">
+              {/* Quick Perks: Discount Badge, Friends Joined & Referral Code */}
+              <div className="flex flex-wrap items-center gap-3">
                 
                 {/* Discount Badge */}
-                <div className="bg-[#520C11] border border-[#FFDE59]/30 rounded-2xl p-4 flex flex-col justify-center min-w-[130px] text-center shadow-inner">
+                <div className="bg-[#520C11] border border-[#FFDE59]/30 rounded-2xl p-3.5 sm:p-4 flex flex-col justify-center min-w-[125px] text-center shadow-inner">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-white/70">
                     Your Discount
                   </span>
@@ -342,12 +345,39 @@ export default function ProfileContent() {
                   </span>
                 </div>
 
+                {/* Friends Joined Badge */}
+                <div className="bg-[#520C11] border border-[#FFDE59]/30 rounded-2xl p-3.5 sm:p-4 flex flex-col justify-center min-w-[135px] text-center shadow-inner">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-white/70">
+                    Friends Joined
+                  </span>
+                  <span className="font-inter font-black text-[#FFDE59] text-2xl sm:text-3xl leading-none mt-1">
+                    {Math.min(userData.referralsCount || 0, 2)} / 2
+                  </span>
+                  <span className="text-[10px] font-semibold text-white/60 mt-0.5">
+                    {(userData.referralsCount || 0) >= 2
+                      ? "✓ +10% Active"
+                      : (userData.referralsCount || 0) === 1
+                      ? "1 more for +10%"
+                      : "2 for +10% OFF"}
+                  </span>
+                </div>
+
                 {/* Referral Code Copy Pill */}
                 {userData.referralCode && (
-                  <div className="bg-[#520C11] border border-[#FFDE59]/30 rounded-2xl p-4 flex flex-col justify-center min-w-[160px] shadow-inner">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-white/70 mb-1">
-                      Referral Code
-                    </span>
+                  <div className="bg-[#520C11] border border-[#FFDE59]/30 rounded-2xl p-3.5 sm:p-4 flex flex-col justify-center min-w-[160px] shadow-inner">
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-white/70">
+                        Referral Code
+                      </span>
+                      <button
+                        onClick={openReferModal}
+                        type="button"
+                        className="text-[11px] font-bold text-[#FFDE59] hover:underline cursor-pointer"
+                        title="Open full referral share details"
+                      >
+                        Share &rarr;
+                      </button>
+                    </div>
                     <button
                       onClick={copyReferralLink}
                       type="button"

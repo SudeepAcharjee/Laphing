@@ -150,7 +150,7 @@ export default function AdminUsersPage() {
                         <span className="text-lg font-black text-white">
                           {user.referralsCount || 0}
                         </span>
-                        <span className="text-xs text-yellow-100/50 uppercase tracking-wider font-semibold">referred</span>
+                        <span className="text-xs text-yellow-100/50 uppercase tracking-wider font-semibold">/ 2 referred</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">

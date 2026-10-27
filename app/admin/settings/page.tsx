@@ -11,9 +11,9 @@ export default function AdminSettings() {
   const [success, setSuccess] = useState(false);
   
   const [settings, setSettings] = useState({
-    preLaunchDiscount: 10,
+    preLaunchDiscount: 20,
     referralDiscount: 10,
-    maxReferrals: 5,
+    maxReferrals: 2,
   });
 
   useEffect(() => {
@@ -122,7 +122,7 @@ export default function AdminSettings() {
                   onChange={handleChange}
                   className="block w-full bg-[#240608] border border-[#62161A] rounded-xl py-2.5 px-4 text-[#FFDE59] font-black text-lg placeholder-yellow-100/30 focus:ring-2 focus:ring-[#FFDE59] focus:border-transparent transition-all outline-none"
                 />
-                <p className="text-xs text-yellow-100/50 mt-1">Discount earned by the referrer per successful signup.</p>
+                <p className="text-xs text-yellow-100/50 mt-1">Discount earned by the referrer when 2 friends sign up.</p>
               </div>
 
               <div className="space-y-1.5 md:col-span-2">
@@ -138,7 +138,7 @@ export default function AdminSettings() {
                   onChange={handleChange}
                   className="block w-full md:w-1/2 bg-[#240608] border border-[#62161A] rounded-xl py-2.5 px-4 text-[#FFDE59] font-black text-lg placeholder-yellow-100/30 focus:ring-2 focus:ring-[#FFDE59] focus:border-transparent transition-all outline-none"
                 />
-                <p className="text-xs text-yellow-100/50 mt-1">Maximum number of people a single user can refer.</p>
+                <p className="text-xs text-yellow-100/50 mt-1">Maximum number of people a single user can refer (Max 2).</p>
               </div>
             </div>
           </div>

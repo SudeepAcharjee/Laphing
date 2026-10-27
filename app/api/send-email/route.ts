@@ -1,20 +1,84 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
-import path from "path";
-import fs from "fs";
+import {
+  renderMasterEmail,
+  getWelcomeEmailHtml,
+  getOrderStatusEmailHtml,
+  getBroadcastEmailHtml,
+} from "@/lib/email-templates";
 
 export async function POST(request: Request) {
   try {
-    const { to, subject, text, html } = await request.json();
+    const body = await request.json();
+    const {
+      to,
+      subject: reqSubject,
+      text: reqText,
+      html: reqHtml,
+      type,
+      name,
+      referralCode,
+      discountPercent,
+      orderId,
+      newStatus,
+    } = body;
 
-    if (!to || !subject || (!text && !html)) {
+    if (!to) {
       return NextResponse.json(
-        { error: "Missing required fields: 'to', 'subject', and 'text' or 'html' are required." },
+        { error: "Missing required recipient 'to' address." },
         { status: 400 }
       );
     }
 
-    // Create a Nodemailer transporter using SMTP
+    let finalSubject = reqSubject;
+    let finalHtml = reqHtml;
+    let finalText = reqText;
+
+    // Handle template types
+    if (type === "welcome") {
+      const welcome = getWelcomeEmailHtml({
+        name: name || "",
+        referralCode: referralCode || "",
+        discountPercent: discountPercent ?? 20,
+      });
+      finalSubject = finalSubject || welcome.subject;
+      finalHtml = welcome.html;
+      finalText = welcome.text;
+    } else if (type === "order_status") {
+      const orderUpdate = getOrderStatusEmailHtml({
+        orderId: orderId || "",
+        customerName: name || "",
+        newStatus: newStatus || "Processing",
+      });
+      finalSubject = finalSubject || orderUpdate.subject;
+      finalHtml = orderUpdate.html;
+      finalText = orderUpdate.text;
+    } else if (type === "broadcast" && reqSubject && reqText) {
+      const broadcast = getBroadcastEmailHtml({
+        subject: reqSubject,
+        message: reqText,
+      });
+      finalSubject = broadcast.subject;
+      finalHtml = broadcast.html;
+      finalText = broadcast.text;
+    } else if (!finalHtml && (reqSubject || finalText)) {
+      // Default fallback: wrap plain text in master brand email layout
+      finalHtml = renderMasterEmail({
+        headline: finalSubject || "Message from de Laphing co.",
+        bodyHtml: `<div style="white-space: pre-wrap; font-size: 15px; line-height: 1.7; color: #3A2022;">${
+          finalText || ""
+        }</div>`,
+      });
+    }
+
+    if (!finalSubject || (!finalHtml && !finalText)) {
+      return NextResponse.json(
+        { error: "Missing required fields: subject and message body are required." },
+        { status: 400 }
+      );
+    }
+
+    // Configure Nodemailer transporter using SMTP
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -23,48 +87,13 @@ export async function POST(request: Request) {
       },
     });
 
-    // Check for brand logo file to embed as CID attachment
-    const logoPath = path.join(process.cwd(), "public", "logomain.svg");
-    const attachments: any[] = [];
-    if (fs.existsSync(logoPath)) {
-      attachments.push({
-        filename: "logomain.svg",
-        path: logoPath,
-        cid: "brandlogo",
-        contentType: "image/svg+xml",
-      });
-    }
-
-    // Default HTML wrapper if only plain text is provided
-    const finalHtml = html || `
-      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; background: #ffffff; border-radius: 14px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 1px solid #f0e6e6;">
-        <div style="background-color: #741117; padding: 28px 20px; text-align: center;">
-          <img src="cid:brandlogo" alt="de Laphing co." width="170" style="display: block; margin: 0 auto 8px auto; max-width: 170px; height: auto;" />
-          <div style="color: #FFDE59; font-size: 22px; font-weight: 900; letter-spacing: 0.5px; text-transform: lowercase;">de Laphing co.</div>
-        </div>
-        <div style="padding: 28px 24px;">
-          <h3 style="margin-top: 0; color: #741117; font-size: 20px;">${subject}</h3>
-          <div style="font-size: 15px; line-height: 1.7; color: #444; white-space: pre-wrap;">
-            ${text}
-          </div>
-          <br/>
-          <p style="font-size: 14px; line-height: 1.6; color: #555; border-top: 1px solid #f0e6e6; padding-top: 16px;">
-            With spice & love,<br/>
-            <strong style="color: #741117;">de Laphing co. Team</strong>
-          </p>
-        </div>
-      </div>
-    `;
-
-    // Setup email data
     const isBulk = Array.isArray(to);
-    
+
     const mailOptions: any = {
       from: `"de Laphing co." <${process.env.MAIL_USER}>`,
-      subject,
-      text: text || "Please view this email in an HTML-compatible client.",
+      subject: finalSubject,
+      text: finalText || "Please view this email in an HTML-compatible client.",
       html: finalHtml,
-      attachments,
     };
 
     if (isBulk) {
@@ -74,7 +103,6 @@ export async function POST(request: Request) {
       mailOptions.to = to;
     }
 
-    // Send email
     const info = await transporter.sendMail(mailOptions);
 
     return NextResponse.json({ success: true, messageId: info.messageId });

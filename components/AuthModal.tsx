@@ -124,12 +124,16 @@ export default function AuthModal() {
       // 1. Fetch settings
       let preLaunchDiscount = 20;
       let referDiscount = 10;
+      let maxReferrals = 2;
       try {
         const settingsSnap = await getDoc(doc(db, "settings", "global"));
         if (settingsSnap.exists()) {
           const d = settingsSnap.data();
-          preLaunchDiscount = d.preLaunchDiscount || 20;
-          referDiscount = d.referralDiscount || 10;
+          preLaunchDiscount = d.preLaunchDiscount ?? 20;
+          referDiscount = d.referralDiscount ?? 10;
+          if (d.maxReferrals !== undefined && d.maxReferrals !== null) {
+            maxReferrals = Number(d.maxReferrals);
+          }
         }
       } catch (err) {
         console.warn("Could not fetch global settings, using defaults", err);
@@ -145,7 +149,8 @@ export default function AuthModal() {
 
       // 3. Generate unique referral code
       const userRefCode = generateReferralCode(formData.name);
-      const appliedRef = formData.referralCode.trim() || null;
+      const rawRef = formData.referralCode.trim();
+      const appliedRef = rawRef ? rawRef.toLowerCase() : null;
 
       // 4. Save user document in Firestore (NO address field)
       await setDoc(doc(db, "users", newUser.uid), {
@@ -154,29 +159,45 @@ export default function AuthModal() {
         phone: formData.phone.trim(),
         consent: formData.consent,
         referralCode: userRefCode,
-        referredBy: appliedRef,
+        referredBy: rawRef || null,
         discountAvailable: preLaunchDiscount,
         createdAt: new Date(),
         referralsCount: 0,
       });
 
-      // 5. If referred, increment referrer's count & discount
-      if (appliedRef) {
+      // 5. If referred, increment referrer's count & grant +10% only when 2 friends sign up
+      if (appliedRef && appliedRef !== userRefCode.toLowerCase()) {
         try {
-          const q = query(
+          let q = query(
             collection(db, "users"),
             where("referralCode", "==", appliedRef)
           );
-          const querySnapshot = await getDocs(q);
+          let querySnapshot = await getDocs(q);
+          if (querySnapshot.empty && rawRef !== appliedRef) {
+            q = query(
+              collection(db, "users"),
+              where("referralCode", "==", rawRef)
+            );
+            querySnapshot = await getDocs(q);
+          }
+
           if (!querySnapshot.empty) {
             const referrerDoc = querySnapshot.docs[0];
-            const referrerData = referrerDoc.data();
-            const maxReferrals = 5;
-            if ((referrerData.referralsCount || 0) < maxReferrals) {
-              await updateDoc(doc(db, "users", referrerDoc.id), {
-                referralsCount: increment(1),
-                discountAvailable: increment(referDiscount),
-              });
+            if (referrerDoc.id !== newUser.uid) {
+              const referrerData = referrerDoc.data();
+              const currentCount = referrerData.referralsCount || 0;
+
+              if (currentCount < maxReferrals) {
+                const newCount = currentCount + 1;
+                const updatePayload: any = {
+                  referralsCount: increment(1),
+                };
+                // Referrer gets 10% discount ONLY if 2 people sign up with their code
+                if (newCount === 2) {
+                  updatePayload.discountAvailable = increment(referDiscount);
+                }
+                await updateDoc(doc(db, "users", referrerDoc.id), updatePayload);
+              }
             }
           }
         } catch (refErr) {
@@ -197,6 +218,25 @@ export default function AuthModal() {
         });
       } catch (signupErr) {
         console.warn("Could not mirror to signups collection", signupErr);
+      }
+
+      // 7. Dispatch 20% OFF Welcome Email automatically
+      try {
+        fetch("/api/send-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            type: "welcome",
+            to: formData.email.trim().toLowerCase(),
+            name: formData.name.trim(),
+            referralCode: userRefCode,
+            discountPercent: preLaunchDiscount || 20,
+          }),
+        }).catch((mailErr) => {
+          console.warn("Background welcome email error:", mailErr);
+        });
+      } catch (emailErr) {
+        console.warn("Could not trigger welcome email:", emailErr);
       }
 
       await refreshUserData();
@@ -247,7 +287,8 @@ export default function AuthModal() {
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.email.trim()) {
+    const targetEmail = formData.email.trim();
+    if (!targetEmail) {
       setError("Please enter your registered email address.");
       return;
     }
@@ -256,8 +297,23 @@ export default function AuthModal() {
     setSuccess("");
 
     try {
-      await sendPasswordResetEmail(auth, formData.email.trim());
-      setSuccess("Password reset link sent! Please check your email inbox and spam folder.");
+      // 1. Try sending via branded email API (uses brand theme, logo & View Link to open Firebase link)
+      const res = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: targetEmail }),
+      });
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        setSuccess("Password reset email sent! Please check your inbox and click 'View Link'.");
+      } else if (data.fallbackToClient) {
+        // Fallback to client-side Firebase Auth if Admin SDK credentials are not configured
+        await sendPasswordResetEmail(auth, targetEmail);
+        setSuccess("Password reset link sent! Please check your email inbox and spam folder.");
+      } else {
+        throw new Error(data.error || "Failed to send reset email.");
+      }
     } catch (err: any) {
       console.error("Forgot password error:", err);
       if (err.code === "auth/user-not-found") {

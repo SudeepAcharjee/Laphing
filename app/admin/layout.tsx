@@ -58,12 +58,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   };
 
   useEffect(() => {
-    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || "delaphingcompany@gmail.com";
+    const rawAdminEmails = process.env.NEXT_PUBLIC_ADMIN_EMAIL || "delaphingcompany@gmail.com,sudeepacharjeegp@gmail.com";
+    const allowedAdmins = rawAdminEmails
+      .toLowerCase()
+      .split(",")
+      .map((e) => e.trim())
+      .filter(Boolean);
+
+    // Ensure both essential admin emails are always permitted
+    if (!allowedAdmins.includes("delaphingcompany@gmail.com")) allowedAdmins.push("delaphingcompany@gmail.com");
+    if (!allowedAdmins.includes("sudeepacharjeegp@gmail.com")) allowedAdmins.push("sudeepacharjeegp@gmail.com");
     
     const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
+      const userEmail = currentUser?.email?.toLowerCase().trim();
       if (!currentUser && pathname !== "/admin/login") {
         router.push("/admin/login");
-      } else if (currentUser && pathname !== "/admin/login" && currentUser.email !== adminEmail) {
+      } else if (currentUser && pathname !== "/admin/login" && (!userEmail || !allowedAdmins.includes(userEmail))) {
         signOut(auth).then(() => {
           router.push("/admin/login?error=unauthorized");
         });

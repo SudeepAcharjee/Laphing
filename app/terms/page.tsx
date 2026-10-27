@@ -65,7 +65,10 @@ export default function TermsOfServicePage() {
                 <strong className="text-white">20% OFF Launch Discount:</strong> Automatically applied to your launch order when registering for the official waitlist.
               </li>
               <li>
-                <strong className="text-white">+10% OFF Referral Credits:</strong> For every friend who signs up using your unique referral link, you receive an additional +10% discount on your order.
+                <strong className="text-white">+10% OFF Referral Bonus:</strong> Share your unique referral code with up to 2 friends. When 2 friends sign up using your code, you unlock an additional +10% discount on your order (for a maximum total discount of 30%).
+              </li>
+              <li>
+                <strong className="text-white">Referral Limit:</strong> Each user can refer a maximum of 2 people. The 10% referral discount is unlocked only when 2 friends successfully register with your referral code.
               </li>
               <li>
                 Promotional credits are non-transferable and may not be redeemed for raw cash. Any bot signups or self-referral attempts will result in immediate cancellation of referral rewards.

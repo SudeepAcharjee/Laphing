@@ -23,7 +23,7 @@ function AdminLoginForm() {
     setError("");
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      await signInWithEmailAndPassword(auth, email.trim(), password);
       router.push("/admin"); // Redirect to dashboard overview on success
     } catch (err: any) {
       setError("Invalid email or password. Please try again.");

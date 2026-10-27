@@ -13,9 +13,6 @@ import {
   ArrowRight,
   ArrowLeft,
   Bell,
-  Clock,
-  ShieldCheck,
-  Flame,
   CheckCircle2,
   Gift,
   User,
@@ -354,16 +351,6 @@ export default function CheckoutPage() {
                   <ArrowRight className="w-5 h-5 stroke-[2.5]" />
                 </button>
 
-                <div className="mt-4 flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-white/70 text-[12px] font-medium text-center">
-                  <span className="flex items-center gap-1.5">
-                    <ShieldCheck className="w-4 h-4 text-[#FFDE59]" />
-                    No Immediate Payment Required
-                  </span>
-                  <span>•</span>
-                  <span>Free Cold-Pack Dispatch</span>
-                  <span>•</span>
-                  <span>Authentic Tibetan Recipe</span>
-                </div>
               </div>
 
             </form>
@@ -402,7 +389,7 @@ export default function CheckoutPage() {
                 </p>
                 <div className="flex items-center gap-2 mt-2">
                   <span className="inline-block text-[11px] font-bold text-[#FFDE59] uppercase tracking-wider bg-[#FFDE59]/10 px-2 py-0.5 rounded-full">
-                    2 Servings Inside
+                    3 Servings Inside
                   </span>
                 </div>
               </div>
@@ -417,7 +404,7 @@ export default function CheckoutPage() {
             <div className="flex items-center justify-between bg-[#401316]/70 border border-[#81191B]/80 px-4 py-3 rounded-2xl">
               <div>
                 <p className="text-white font-bold text-sm">Quantity</p>
-                <p className="text-white/50 text-[11px]">Packs of 2 servings</p>
+                <p className="text-white/50 text-[11px]">Pack of 3 servings</p>
               </div>
               <div className="flex items-center gap-3 bg-[#2D0D10] border border-[#81191B] rounded-xl px-2 py-1">
                 <button
@@ -471,10 +458,8 @@ export default function CheckoutPage() {
               )}
 
               <div className="flex justify-between text-white/75 text-[14px]">
-                <span>Cold Dispatch & Delivery</span>
-                <span className="text-[#FFDE59] font-bold uppercase tracking-wider text-[12px]">
-                  FREE
-                </span>
+                <span>Delivery</span>
+                <span className="text-white font-medium">₹0</span>
               </div>
             </div>
 
@@ -489,17 +474,6 @@ export default function CheckoutPage() {
                   ₹{finalTotal}
                 </span>
               </div>
-            </div>
-
-            {/* Guarantee Banner */}
-            <div className="bg-[#401316] border border-[#81191B]/80 rounded-2xl p-4 text-[12px] text-white/75 space-y-2">
-              <div className="flex items-center gap-2 text-[#FFDE59] font-bold">
-                <Flame className="w-4 h-4 text-amber-400" />
-                <span>The Laphing Co. Guarantee</span>
-              </div>
-              <p className="leading-relaxed">
-                Made with authentic spices, fresh chillies, garlic paste, and hand-rolled cold gluten noodles. Dispatched in temperature-controlled freshness packs.
-              </p>
             </div>
 
           </div>
@@ -523,58 +497,58 @@ export default function CheckoutPage() {
             if (e.target === e.currentTarget) setShowPreOrderModal(false);
           }}
         >
-          <div className="relative w-full max-w-[460px] my-auto bg-[#FFDE59] text-[#741117] rounded-3xl p-6 sm:p-8 shadow-[0_25px_60px_rgba(0,0,0,0.5)] border-2 border-[#81191B]/25 animate-in zoom-in-95 duration-200 text-center">
+          <div className="relative w-full max-w-[420px] my-auto bg-[#FFDE59] text-[#741117] rounded-3xl p-6 sm:p-7 shadow-[0_25px_60px_rgba(0,0,0,0.5)] border-2 border-[#81191B]/25 animate-in zoom-in-95 duration-200 text-center">
             
             {/* Close Button */}
             <button
               onClick={() => setShowPreOrderModal(false)}
               type="button"
               aria-label="Close pre-order modal"
-              className="absolute top-4 right-4 sm:top-5 sm:right-5 w-9 h-9 flex items-center justify-center rounded-full bg-[#81191B]/10 hover:bg-[#81191B] text-[#81191B] hover:text-[#FFDE59] transition-all duration-200 cursor-pointer"
+              className="absolute top-4 right-4 sm:top-5 sm:right-5 w-8 h-8 flex items-center justify-center rounded-full bg-[#81191B]/10 hover:bg-[#81191B] text-[#81191B] hover:text-[#FFDE59] transition-all duration-200 cursor-pointer"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
 
-            {/* Glowing Icon Header */}
-            <div className="mx-auto w-16 h-16 rounded-2xl bg-[#81191B] text-[#FFDE59] flex items-center justify-center shadow-lg mb-4">
-              <Bell className="w-8 h-8 animate-bounce" />
-            </div>
-
-            {/* Status Pill */}
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#81191B]/15 text-[#81191B] text-xs font-black uppercase tracking-widest mb-3">
-              <Clock className="w-3.5 h-3.5" />
-              <span>Pre-Orders Launching Soon</span>
+            {/* Icon Header */}
+            <div className="mx-auto w-14 h-14 rounded-2xl bg-[#81191B] text-[#FFDE59] flex items-center justify-center shadow-md mb-4">
+              <Bell className="w-7 h-7" />
             </div>
 
             {/* Heading */}
-            <h3 className="font-inter font-black text-[#81191B] text-2xl sm:text-[28px] uppercase tracking-tight leading-tight">
+            <h3 className="font-inter font-black text-[#81191B] text-2xl sm:text-[26px] uppercase tracking-tight leading-tight">
               Pre-Orders Dropping Soon!
             </h3>
 
             {/* Core Message */}
-            <p className="mt-3 text-[#741117] text-sm sm:text-base font-medium leading-relaxed">
-              We will be soon accepting Pre-orders and will email you as soon as our fresh cold-dispatch begins!
+            <p className="mt-2 text-[#741117] text-sm font-medium leading-relaxed max-w-[320px] mx-auto">
+              We will notify you by email as soon as our fresh batches go live!
             </p>
 
-            {/* Advance Sign-up Pitch */}
-            <div className="mt-4 p-4 rounded-2xl bg-[#81191B]/10 border border-[#81191B]/20 text-left">
-              <p className="text-xs sm:text-[13px] text-[#741117] leading-relaxed font-semibold">
-                ✨ <strong>Advance VIP Access:</strong> Sign up today to secure early priority dispatch, instant stock drops, and unlock an exclusive <strong>20% discount</strong> on your first order!
-              </p>
+            {/* User Status / Sign up */}
+            <div className="mt-5 space-y-3">
+              {user ? (
+                <>
+                  <div className="bg-[#81191B]/10 border border-[#81191B]/20 rounded-2xl p-3.5 text-center text-xs space-y-1">
+                    <p className="font-bold text-[#81191B] text-[13px] flex items-center justify-center gap-1.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
+                      <span>Registered • {discountPercent}% discount active</span>
+                    </p>
+                    {(formData.email || user.email) && (
+                      <p className="text-[#741117]/75 truncate font-medium">
+                        Updates to: <span className="font-bold text-[#81191B]">{formData.email || user.email}</span>
+                      </p>
+                    )}
+                  </div>
 
-              {(formData.email || user?.email) && (
-                <div className="mt-2.5 pt-2 border-t border-[#81191B]/15 flex items-center gap-2 text-xs text-[#81191B] font-bold">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
-                  <span className="truncate">
-                    Updates will be sent to: <u>{formData.email || user?.email}</u>
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* Action Buttons */}
-            <div className="mt-6 flex flex-col gap-2.5">
-              {!user ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowPreOrderModal(false)}
+                    className="w-full bg-[#81191B] hover:bg-[#681416] text-[#FFDE59] font-inter font-black text-sm uppercase tracking-wider py-3.5 px-5 rounded-2xl shadow-lg transition-all duration-200 active:scale-95 cursor-pointer"
+                  >
+                    Got It, Thank You!
+                  </button>
+                </>
+              ) : (
                 <>
                   <button
                     type="button"
@@ -585,7 +559,7 @@ export default function CheckoutPage() {
                     className="w-full bg-[#81191B] hover:bg-[#681416] text-[#FFDE59] font-inter font-black text-sm uppercase tracking-wider py-3.5 px-5 rounded-2xl shadow-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <Sparkles className="w-4 h-4" />
-                    <span>Sign Up To Get Notifications</span>
+                    <span>Join Waitlist & Save 20%</span>
                   </button>
 
                   <button
@@ -594,25 +568,11 @@ export default function CheckoutPage() {
                       setShowPreOrderModal(false);
                       openAuthModal("login");
                     }}
-                    className="w-full bg-transparent hover:bg-[#81191B]/10 text-[#81191B] font-inter font-bold text-xs uppercase tracking-wider py-2.5 rounded-xl transition-all cursor-pointer"
+                    className="w-full text-[#81191B] hover:text-[#520C11] font-inter font-bold text-xs uppercase tracking-wider py-1.5 transition-colors cursor-pointer"
                   >
                     Already have an account? Log In
                   </button>
                 </>
-              ) : (
-                <div className="space-y-3">
-                  <div className="bg-emerald-600/15 border border-emerald-700/30 text-emerald-900 rounded-xl p-3 text-xs font-bold flex items-center justify-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-800" />
-                    <span>You are registered! {discountPercent}% discount is active.</span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setShowPreOrderModal(false)}
-                    className="w-full bg-[#81191B] hover:bg-[#681416] text-[#FFDE59] font-inter font-black text-sm uppercase tracking-wider py-3.5 px-5 rounded-2xl shadow-lg transition-all cursor-pointer"
-                  >
-                    Got It, Thank You!
-                  </button>
-                </div>
               )}
             </div>
 

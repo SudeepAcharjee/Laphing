@@ -24,7 +24,7 @@ export default function ReferModal() {
   };
 
   const shareText = encodeURIComponent(
-    `Craving authentic Tibetan Laphing? Use my referral code "${referralCode}" to get up to 20% off when pre-orders open! ${referralLink}`
+    `Craving authentic Tibetan Laphing? Use my referral code "${referralCode}" to get 20% off when pre-orders open! ${referralLink}`
   );
   const whatsappUrl = `https://api.whatsapp.com/send?text=${shareText}`;
 
@@ -59,12 +59,12 @@ export default function ReferModal() {
             Share The Spice
           </h3>
           <p className="font-inter font-medium text-[#741117]/85 text-[13px] sm:text-[14px] mt-1 max-w-[320px] leading-snug">
-            Give friends 10% off. You unlock +10% off for each friend who signs up (up to 30% OFF total)!
+            Get 20% OFF on signup. Refer 2 friends to unlock an extra +10% OFF (up to 30% OFF total)!
           </p>
         </div>
 
         {/* Perk Badges */}
-        <div className="grid grid-cols-2 gap-3 mb-5">
+        <div className="grid grid-cols-2 gap-3 mb-3">
           <div className="bg-[#FFFBF0] rounded-2xl p-3 border border-[#81191B]/20 text-center">
             <span className="block text-[11px] font-bold uppercase tracking-wider text-[#81191B]/70">
               Your Discount
@@ -79,9 +79,27 @@ export default function ReferModal() {
               Friends Joined
             </span>
             <span className="font-inter font-black text-[24px] text-[#81191B] leading-tight block mt-0.5">
-              {referralsCount} / 5
+              {Math.min(referralsCount, 2)} / 2
             </span>
           </div>
+        </div>
+
+        {/* Referral Status Progress Notice */}
+        <div className="mb-4 px-3 py-2 rounded-xl bg-[#FFFBF0]/90 border border-[#81191B]/20 text-center text-[12px] font-semibold text-[#81191B] shadow-inner">
+          {referralsCount >= 2 ? (
+            <span className="text-emerald-700 flex items-center justify-center gap-1.5 font-bold">
+              <Check className="w-4 h-4 stroke-[3]" />
+              Goal reached! Your +10% bonus is active (30% OFF total).
+            </span>
+          ) : referralsCount === 1 ? (
+            <span>
+              🔥 1 friend joined! Need <strong>1 more friend</strong> to unlock +10% OFF.
+            </span>
+          ) : (
+            <span>
+              Invite <strong>2 friends</strong> to unlock an extra <strong>+10% OFF</strong>.
+            </span>
+          )}
         </div>
 
         {/* Referral Link Copy Area */}

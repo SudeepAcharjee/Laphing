@@ -50,27 +50,10 @@ export default function AdminOrdersPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             to: customerEmail,
-            subject: `Order Status Update: ${newStatus} - de Laphing co.`,
-            html: `
-              <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; background: #ffffff; border-radius: 14px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 1px solid #f0e6e6;">
-                <div style="background-color: #741117; padding: 28px 20px; text-align: center;">
-                  <img src="cid:brandlogo" alt="de Laphing co." width="170" style="display: block; margin: 0 auto 8px auto; max-width: 170px; height: auto;" />
-                  <div style="color: #FFDE59; font-size: 22px; font-weight: 900; letter-spacing: 0.5px; text-transform: lowercase;">de Laphing co.</div>
-                </div>
-                <div style="padding: 28px 24px;">
-                  <h3 style="margin-top: 0; color: #741117; font-size: 20px;">Order Status Update</h3>
-                  <p style="font-size: 15px; line-height: 1.6; color: #444;">Dear ${customerName || 'Customer'},</p>
-                  <p style="font-size: 15px; line-height: 1.6; color: #444;">We are writing to formally inform you that there has been an update regarding your recent order (Order ID: #${orderId.slice(0, 8)}).</p>
-                  <p style="font-size: 15px; line-height: 1.6; color: #444;">Your order status has been updated to: <strong style="color: #741117; background: #FFDE59; padding: 4px 10px; border-radius: 6px; display: inline-block;">${newStatus}</strong></p>
-                  <p style="font-size: 15px; line-height: 1.6; color: #444;">We are working diligently to ensure your package reaches you safely and on time. If you have any questions or concerns regarding this update, please feel free to reply directly to this email.</p>
-                  <br/>
-                  <p style="font-size: 14px; line-height: 1.6; color: #555; border-top: 1px solid #f0e6e6; padding-top: 16px;">
-                    Warm regards,<br/>
-                    <strong style="color: #741117;">de Laphing co. Delivery Team</strong>
-                  </p>
-                </div>
-              </div>
-            `,
+            type: "order_status",
+            orderId,
+            name: customerName,
+            newStatus,
           }),
         });
         

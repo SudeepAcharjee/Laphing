@@ -5,6 +5,7 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/context/AuthContext";
+import LaphingGuideSection from "@/components/LaphingGuideSection";
 
 export default function Home() {
   const { openAuthModal } = useAuth();
@@ -14,27 +15,37 @@ export default function Home() {
       {/* ================= MAROON & CREAM NAVBAR ================= */}
       <Navbar />
 
-      {/* ================= HERO SECTION ================= */}
-      <main className="relative w-full bg-[#741117]">
-        <Image
-          src="/hero.png"
-          alt="The Laphing Co. - Love. Laph. Cheat. Chilli Garlic Laphing"
-          width={1440}
-          height={810}
-          priority
-          quality={100}
-          className="w-full h-auto block"
-          sizes="100vw"
-        />
-      </main>
+      <main className="flex-1 w-full">
+        {/* ================= HERO SECTION & H1 ================= */}
+        <section className="relative w-full bg-[#741117]">
+          <h1 className="sr-only">
+            The Laphing Co. | Authentic Tibetan Spicy Cold Noodles &amp; Soupy Laphing at Home | Majnu Ka Tilla Delhi Street Food
+          </h1>
+          <Image
+            src="/hero.png"
+            alt="The Laphing Co. - Authentic Tibetan Spicy Cold Noodles and Soupy Laphing with Artisanal Chilli Oil"
+            width={1440}
+            height={810}
+            priority
+            quality={100}
+            className="w-full h-auto block"
+            sizes="100vw"
+          />
+        </section>
 
       {/* ================= CALLOUT BANNER ================= */}
       <section className="relative w-full bg-[#6B1319] select-none border-t border-black/10">
         <div className="w-full max-w-[1440px] mx-auto px-3 sm:px-10 md:px-16 lg:px-20 py-6 sm:py-8 md:py-10 flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6">
           
-          {/* Headline - strictly 1 line */}
-          <h2 className="font-inter font-black text-white text-[15px] min-[360px]:text-[17px] min-[390px]:text-[19px] sm:text-[26px] md:text-[32px] lg:text-[38px] xl:text-[40px] tracking-tight uppercase text-center md:text-left leading-tight drop-shadow-sm whitespace-nowrap">
-            CRAVING LAPHING? WE GET IT.
+          {/* Headline: Prominent Main Heading + Stylized Accent */}
+          <h2 className="flex flex-wrap items-baseline justify-center md:justify-start gap-x-4 sm:gap-x-6 md:gap-x-8 gap-y-1.5 drop-shadow-sm text-center md:text-left">
+            <span className="font-inter font-black text-white text-[22px] min-[360px]:text-[24px] sm:text-[30px] md:text-[36px] lg:text-[40px] xl:text-[44px] tracking-tight uppercase leading-none inline-flex items-baseline gap-x-3 sm:gap-x-4 md:gap-x-5 lg:gap-x-6">
+              <span>CRAVING</span>
+              <span>LAPHING?</span>
+            </span>
+            <span className="font-slackey text-[#FFDE59] text-[18px] min-[360px]:text-[20px] sm:text-[24px] md:text-[27px] lg:text-[30px] xl:text-[32px] tracking-normal uppercase leading-none">
+              WE GET IT.
+            </span>
           </h2>
 
           {/* Action Button */}
@@ -356,69 +367,290 @@ export default function Home() {
 
         </div>
 
-        {/* ================= MOBILE STACK (< 768px) ================= */}
-        <div className="md:hidden relative z-10 w-full max-w-[500px] mx-auto px-4 xs:px-6 py-10 sm:py-14 flex flex-col items-center">
+        {/* ================= MOBILE STAGE (< 768px) - Exact Same UI as Desktop ================= */}
+        <div className="md:hidden relative z-10 w-full max-w-[480px] mx-auto px-2 pt-8 pb-10 flex flex-col items-center">
           
           {/* Mobile Header */}
-          <div className="text-center mb-6 sm:mb-8 max-w-sm sm:max-w-none">
-            <span className="font-inter font-bold text-[#81191B] text-[11px] sm:text-[13px] tracking-widest uppercase block mb-1.5 sm:mb-2">
+          <div className="text-center mb-4 px-3">
+            <span className="font-inter font-bold text-[#81191B] text-[11px] tracking-widest uppercase block mb-1">
               WHAT GOES INTO THE GOOD STUFF
             </span>
-            <h2 className="font-inter font-black text-[#81191B] text-[26px] xs:text-[32px] sm:text-[42px] leading-[1.08] tracking-tight block mb-2 sm:mb-2.5">
+            <h2 className="font-inter font-black text-[#81191B] text-[26px] xs:text-[30px] leading-[1.08] tracking-tight block mb-1.5">
               What’s inside this Baddie?
             </h2>
-            <p className="font-inter font-medium text-[#81191B] text-[14px] sm:text-[16px] block">
+            <p className="font-inter font-medium text-[#81191B] text-[13px] xs:text-[14px] block">
               Six little personalities. One big craving.
             </p>
           </div>
 
-          {/* Center Pouch */}
-          <div className="relative w-[200px] xs:w-[240px] sm:w-[280px] aspect-[470/622] rotate-[-3deg] drop-shadow-[0_16px_28px_rgba(129,25,27,0.14)] mb-1">
-            <Image
-              src="/about/center.png"
-              alt="Laphing Packaging Pouch"
-              fill
-              priority
-              className="object-contain"
-              sizes="(max-width: 640px) 240px, 280px"
-            />
-          </div>
+          {/* Mobile Interactive Stage - 1:1 Matching Desktop Layout */}
+          <div className="relative w-full aspect-[390/490] max-h-[520px]">
+            
+            {/* Mobile SVG Connector Trails & Backdrop */}
+            <svg
+              className="absolute inset-0 w-full h-full pointer-events-none overflow-visible z-10"
+              viewBox="0 0 390 490"
+              fill="none"
+            >
+              {/* Central White Trapezoid/Curved Backdrop */}
+              <path
+                d="M 132 15 C 142 160, 120 330, 98 470 L 292 470 C 270 330, 248 160, 258 15 Z"
+                fill="rgba(255, 255, 255, 0.22)"
+              />
 
-          {/* Mobile Oval Shadow */}
-          <div className="w-[190px] xs:w-[230px] sm:w-[260px] h-[34px] sm:h-[40px] rounded-[50%] bg-[#81191B]/15 -mt-5 mb-2.5 pointer-events-none" />
+              {/* Trail 0: Top-Left (Chilli Sauce to Pouch) */}
+              <path
+                d="M 96 112 C 114 116, 130 120, 144 116"
+                stroke="#81191B"
+                strokeWidth="2.2"
+                strokeDasharray="3 4"
+                opacity="0.8"
+                strokeLinecap="round"
+              />
 
-          {/* Mobile Badge: Ready in 5 mins! (Compact, Rotated Clockwise 4.5deg) */}
-          <div className="px-5 py-2 sm:px-6 sm:py-2.5 rounded-xl bg-[#FFFDF6] border border-[#EFE5D5] shadow-[0_6px_18px_rgba(130,80,60,0.08)] mb-6 sm:mb-8 rotate-[4.5deg]">
-            <span className="font-inter font-bold text-[#81191B] text-[15px] sm:text-[19px] tracking-normal block leading-none">
-              Ready in 5 mins!
-            </span>
-          </div>
+              {/* Trail 1: Mid-Left (Soya Granules to Pouch) */}
+              <path
+                d="M 102 232 C 118 235, 132 232, 144 227"
+                stroke="#81191B"
+                strokeWidth="2.2"
+                strokeDasharray="3 4"
+                opacity="0.8"
+                strokeLinecap="round"
+              />
 
-          {/* 6 SVG Mascots Grid on Mobile */}
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 w-full">
-            {[
-              { src: "/about/1.svg", alt: "Chilli Sauce" },
-              { src: "/about/4.svg", alt: "Wai Wai Noodles" },
-              { src: "/about/5.svg", alt: "Soya Granules" },
-              { src: "/about/2.svg", alt: "Sauce Mix" },
-              { src: "/about/6.svg", alt: "Laphing Sheets" },
-              { src: "/about/3.svg", alt: "Garlic Flakes" },
-            ].map((item, idx) => (
-              <div 
-                key={idx}
-                className="relative w-full aspect-square flex items-center justify-center p-2 rounded-2xl bg-[#FFFDF6]/40 border border-[#81191B]/10 shadow-[0_4px_12px_rgba(129,25,27,0.04)] transition-transform duration-300 hover:scale-105"
-              >
-                <div className="relative w-full h-full max-h-[120px] xs:max-h-[135px] sm:max-h-[140px] drop-shadow-[0_4px_12px_rgba(0,0,0,0.06)]">
-                  <Image
-                    src={item.src}
-                    alt={item.alt}
-                    fill
-                    unoptimized
-                    className="object-contain"
-                  />
-                </div>
+              {/* Trail 2: Bottom-Left (Laphing Sheets to Pouch) */}
+              <path
+                d="M 104 358 C 118 360, 132 352, 144 340"
+                stroke="#81191B"
+                strokeWidth="2.2"
+                strokeDasharray="3 4"
+                opacity="0.8"
+                strokeLinecap="round"
+              />
+
+              {/* Trail 3: Top-Right (Wai Wai to Pouch) */}
+              <path
+                d="M 292 114 C 276 120, 260 122, 246 118"
+                stroke="#81191B"
+                strokeWidth="2.2"
+                strokeDasharray="3 4"
+                opacity="0.8"
+                strokeLinecap="round"
+              />
+
+              {/* Trail 4: Mid-Right (Sauce Mix to Pouch) */}
+              <path
+                d="M 288 232 C 272 235, 258 232, 246 228"
+                stroke="#81191B"
+                strokeWidth="2.2"
+                strokeDasharray="3 4"
+                opacity="0.8"
+                strokeLinecap="round"
+              />
+
+              {/* Trail 5: Bottom-Right (Garlic Flakes to Pouch) */}
+              <path
+                d="M 286 358 C 272 355, 258 348, 246 340"
+                stroke="#81191B"
+                strokeWidth="2.2"
+                strokeDasharray="3 4"
+                opacity="0.8"
+                strokeLinecap="round"
+              />
+
+              {/* Top Accent Lines */}
+              <line x1="120" y1="16" x2="124" y2="30" stroke="#81191B" strokeWidth="2.5" strokeLinecap="round" />
+              <line x1="135" y1="12" x2="133" y2="30" stroke="#81191B" strokeWidth="2.5" strokeLinecap="round" />
+              <line x1="262" y1="12" x2="254" y2="28" stroke="#81191B" strokeWidth="2.5" strokeLinecap="round" />
+
+              {/* Bottom Accent Lines */}
+              <line x1="108" y1="410" x2="116" y2="432" stroke="#81191B" strokeWidth="3" strokeLinecap="round" />
+              <line x1="100" y1="452" x2="118" y2="442" stroke="#81191B" strokeWidth="3" strokeLinecap="round" />
+              <line x1="282" y1="425" x2="265" y2="438" stroke="#81191B" strokeWidth="3" strokeLinecap="round" />
+              <line x1="264" y1="455" x2="280" y2="472" stroke="#81191B" strokeWidth="3" strokeLinecap="round" />
+            </svg>
+
+            {/* Central Pouch (Scaled appropriately for mobile) */}
+            <div
+              className="absolute z-20 transition-transform duration-300 hover:scale-[1.03]"
+              style={{
+                left: '33%',
+                right: '33%',
+                top: '12%',
+                bottom: '24%',
+                transform: 'rotate(-3deg)',
+              }}
+            >
+              <div className="relative w-full h-full drop-shadow-[0_12px_24px_rgba(129,25,27,0.14)]">
+                <Image
+                  src="/about/center.png"
+                  alt="Laphing Packaging Pouch"
+                  fill
+                  priority
+                  className="object-contain"
+                  sizes="(max-width: 768px) 140px, 160px"
+                />
               </div>
-            ))}
+            </div>
+
+            {/* Oval Pouch Shadow */}
+            <div
+              className="absolute pointer-events-none z-15"
+              style={{
+                left: '50%',
+                transform: 'translateX(-50%)',
+                top: '70%',
+                width: '130px',
+                height: '24px',
+                backgroundColor: 'rgba(129, 25, 27, 0.16)',
+                borderRadius: '50%',
+                filter: 'blur(2px)',
+              }}
+            />
+
+            {/* Badge: Ready in 5 mins! */}
+            <div
+              className="absolute z-25 flex items-center justify-center rounded-xl shadow-[0_6px_16px_rgba(130,80,60,0.12)] border border-[#EFE5D5]"
+              style={{
+                left: '50%',
+                transform: 'translateX(-50%) rotate(4.5deg)',
+                top: '77%',
+                width: '155px',
+                height: '40px',
+                backgroundColor: '#FFFDF6',
+              }}
+            >
+              <span className="font-inter font-bold text-[#81191B] text-[13px] xs:text-[14px] leading-none tracking-normal text-center select-none px-2">
+                Ready in 5 mins!
+              </span>
+            </div>
+
+            {/* 1. Chilli Sauce (1.svg) - Top-Left */}
+            <div
+              className="absolute z-20 transition-transform duration-300 active:scale-95"
+              style={{
+                left: '2.5%',
+                top: '9%',
+                width: '24.5%',
+                height: '21%',
+              }}
+            >
+              <div className="relative w-full h-full drop-shadow-[0_6px_14px_rgba(0,0,0,0.06)]">
+                <Image
+                  src="/about/1.svg"
+                  alt="Chilli Sauce"
+                  fill
+                  unoptimized
+                  className="object-contain"
+                />
+              </div>
+            </div>
+
+            {/* 2. Soya Granules (5.svg) - Middle-Left */}
+            <div
+              className="absolute z-20 transition-transform duration-300 active:scale-95"
+              style={{
+                left: '1%',
+                top: '36%',
+                width: '27.5%',
+                height: '21%',
+              }}
+            >
+              <div className="relative w-full h-full drop-shadow-[0_6px_14px_rgba(0,0,0,0.06)]">
+                <Image
+                  src="/about/5.svg"
+                  alt="Soya Granules"
+                  fill
+                  unoptimized
+                  className="object-contain"
+                />
+              </div>
+            </div>
+
+            {/* 3. Laphing Sheets (6.svg) - Bottom-Left */}
+            <div
+              className="absolute z-20 transition-transform duration-300 active:scale-95"
+              style={{
+                left: '1%',
+                top: '63%',
+                width: '28%',
+                height: '21%',
+              }}
+            >
+              <div className="relative w-full h-full drop-shadow-[0_6px_14px_rgba(0,0,0,0.06)]">
+                <Image
+                  src="/about/6.svg"
+                  alt="Laphing Sheets"
+                  fill
+                  unoptimized
+                  className="object-contain"
+                />
+              </div>
+            </div>
+
+            {/* 4. Wai Wai Noodles (4.svg) - Top-Right */}
+            <div
+              className="absolute z-20 transition-transform duration-300 active:scale-95"
+              style={{
+                right: '2.5%',
+                top: '9%',
+                width: '24.5%',
+                height: '21%',
+              }}
+            >
+              <div className="relative w-full h-full drop-shadow-[0_6px_14px_rgba(0,0,0,0.06)]">
+                <Image
+                  src="/about/4.svg"
+                  alt="Wai Wai Noodles"
+                  fill
+                  unoptimized
+                  className="object-contain"
+                />
+              </div>
+            </div>
+
+            {/* 5. Sauce Mix (2.svg) - Middle-Right */}
+            <div
+              className="absolute z-20 transition-transform duration-300 active:scale-95"
+              style={{
+                right: '2.5%',
+                top: '36%',
+                width: '24.5%',
+                height: '21%',
+              }}
+            >
+              <div className="relative w-full h-full drop-shadow-[0_6px_14px_rgba(0,0,0,0.06)]">
+                <Image
+                  src="/about/2.svg"
+                  alt="Sauce Mix"
+                  fill
+                  unoptimized
+                  className="object-contain"
+                />
+              </div>
+            </div>
+
+            {/* 6. Garlic Flakes (3.svg) - Bottom-Right */}
+            <div
+              className="absolute z-20 transition-transform duration-300 active:scale-95"
+              style={{
+                right: '2%',
+                top: '63%',
+                width: '25%',
+                height: '20.5%',
+              }}
+            >
+              <div className="relative w-full h-full drop-shadow-[0_6px_14px_rgba(0,0,0,0.06)]">
+                <Image
+                  src="/about/3.svg"
+                  alt="Garlic Flakes"
+                  fill
+                  unoptimized
+                  className="object-contain"
+                />
+              </div>
+            </div>
+
           </div>
 
         </div>
@@ -426,10 +658,10 @@ export default function Home() {
       </section>
 
       {/* ================= SECTION 3: GET ON THE LIST (Waitlist & Discount) ================= */}
-      <section className="relative w-full overflow-hidden select-none bg-[#741117]">
+      <section className="relative w-full overflow-hidden select-none bg-[#81191B] lg:bg-gradient-to-r lg:from-[#81191B] lg:from-60% lg:to-[#FFDD6E] lg:to-60%">
         
-        {/* ================= DESKTOP STAGE (1024px+) - Auto-Adjusting Aspect Ratio matching 20%offbg.png ================= */}
-        <div className="hidden lg:block relative w-full max-w-[1440px] aspect-[1440/880] mx-auto">
+        {/* ================= DESKTOP STAGE (1024px+) - Full width stage matching 20%offbg.png ================= */}
+        <div className="hidden lg:block relative w-full aspect-[1440/880] mx-auto">
           
           {/* Section Background (20%offbg.png) */}
           <Image
@@ -536,7 +768,7 @@ export default function Home() {
                 fill
                 priority
                 className="object-contain filter drop-shadow-[0_15px_30px_rgba(0,0,0,0.35)]"
-                sizes="(max-width: 1440px) 35vw, 500px"
+                sizes="(max-width: 1024px) 100vw, 35vw"
               />
             </div>
           </div>
@@ -763,6 +995,10 @@ export default function Home() {
 
         </div>
       </section>
+
+      {/* ================= SECTION 5: LAPHING GUIDE (SEO / AEO / GEO) ================= */}
+      <LaphingGuideSection />
+    </main>
 
       {/* ================= FOOTER ================= */}
       <Footer />
