@@ -11,7 +11,7 @@ export default function Navbar() {
   const displayName = userData?.name || user?.displayName || user?.email?.split("@")[0] || "VIP";
 
   return (
-    <header className="w-full bg-[#741117] border-b border-black/10 z-50 select-none shrink-0 transition-all duration-300 shadow-md">
+    <header className="sticky top-0 z-50 w-full bg-[#741117] border-b border-black/10 select-none shrink-0 transition-all duration-300 shadow-md">
       <div className="w-full px-4 sm:px-8 md:px-12 h-[56px] sm:h-[64px] md:h-[72px] flex items-center justify-between">
         
         {/* Left: The Laphing Co. Logo */}

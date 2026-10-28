@@ -100,12 +100,13 @@ export default function AuthModal() {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+    if (error) setError("");
   };
 
   const generateReferralCode = (name: string) => {
-    const randomString = Math.random().toString(36).substring(2, 6);
-    const prefix = (name.trim().split(" ")[0] || "laphing").toLowerCase().replace(/[^a-z0-9]/g, "");
-    return `${prefix || "user"}-${randomString}`;
+    const cleanName = name.replace(/[^a-zA-Z]/g, "").toUpperCase().slice(0, 4) || "LAPH";
+    const randomDigits = Math.floor(1000 + Math.random() * 9000);
+    return `${cleanName}${randomDigits}`;
   };
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -114,32 +115,31 @@ export default function AuthModal() {
     setError("");
     setSuccess("");
 
-    if (!formData.consent) {
-      setError("Please check the box to confirm receiving your discount & updates.");
+    if (!formData.name.trim()) {
+      setError("Please enter your name.");
       setLoading(false);
       return;
     }
 
     try {
-      // 1. Fetch settings
+      // 1. Fetch dynamic settings
       let preLaunchDiscount = 20;
       let referDiscount = 10;
-      let maxReferrals = 2;
+      let maxReferrals = 5;
+
       try {
         const settingsSnap = await getDoc(doc(db, "settings", "global"));
         if (settingsSnap.exists()) {
-          const d = settingsSnap.data();
-          preLaunchDiscount = d.preLaunchDiscount ?? 20;
-          referDiscount = d.referralDiscount ?? 10;
-          if (d.maxReferrals !== undefined && d.maxReferrals !== null) {
-            maxReferrals = Number(d.maxReferrals);
-          }
+          const s = settingsSnap.data();
+          if (s.preLaunchDiscount) preLaunchDiscount = Number(s.preLaunchDiscount);
+          if (s.referDiscount) referDiscount = Number(s.referDiscount);
+          if (s.maxReferrals) maxReferrals = Number(s.maxReferrals);
         }
-      } catch (err) {
-        console.warn("Could not fetch global settings, using defaults", err);
+      } catch (settingsErr) {
+        console.warn("Could not fetch global settings, using defaults", settingsErr);
       }
 
-      // 2. Create Firebase Auth user
+      // 2. Create Auth User
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         formData.email.trim(),
@@ -147,26 +147,30 @@ export default function AuthModal() {
       );
       const newUser = userCredential.user;
 
-      // 3. Generate unique referral code
+      // 3. Create Unique Referral Code
       const userRefCode = generateReferralCode(formData.name);
-      const rawRef = formData.referralCode.trim();
-      const appliedRef = rawRef ? rawRef.toLowerCase() : null;
 
-      // 4. Save user document in Firestore (NO address field)
+      // Handle Referred By
+      const rawRef = formData.referralCode.trim();
+      const appliedRef = rawRef.toUpperCase();
+
+      // 4. Save to Firestore "users" collection
       await setDoc(doc(db, "users", newUser.uid), {
+        uid: newUser.uid,
         name: formData.name.trim(),
         email: formData.email.trim().toLowerCase(),
         phone: formData.phone.trim(),
         consent: formData.consent,
         referralCode: userRefCode,
-        referredBy: rawRef || null,
-        discountAvailable: preLaunchDiscount,
-        createdAt: new Date(),
+        referredBy: appliedRef || null,
         referralsCount: 0,
+        discountAvailable: preLaunchDiscount, // Automatic launch discount
+        role: "user",
+        createdAt: new Date(),
       });
 
-      // 5. If referred, increment referrer's count & grant +10% only when 2 friends sign up
-      if (appliedRef && appliedRef !== userRefCode.toLowerCase()) {
+      // 5. If referred by someone, increment their referral count
+      if (appliedRef) {
         try {
           let q = query(
             collection(db, "users"),
@@ -309,7 +313,11 @@ export default function AuthModal() {
         setSuccess("Password reset email sent! Please check your inbox and click 'View Link'.");
       } else if (data.fallbackToClient) {
         // Fallback to client-side Firebase Auth if Admin SDK credentials are not configured
-        await sendPasswordResetEmail(auth, targetEmail);
+        const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
+        await sendPasswordResetEmail(auth, targetEmail, {
+          url: `${baseUrl}/reset-password`,
+          handleCodeInApp: true,
+        });
         setSuccess("Password reset link sent! Please check your email inbox and spam folder.");
       } else {
         throw new Error(data.error || "Failed to send reset email.");
@@ -329,113 +337,77 @@ export default function AuthModal() {
   };
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/70 backdrop-blur-md overflow-y-auto"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) closeAuthModal();
-      }}
-    >
-      {/* Modal Card - Solid Brand Yellow Background */}
-      <div className="relative w-full max-w-[430px] my-auto bg-[#FFDE59] text-[#741117] rounded-3xl p-6 sm:p-8 shadow-[0_25px_60px_rgba(0,0,0,0.45)] border-2 border-[#81191B]/20 animate-in fade-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
+      <div className="relative w-full max-w-md bg-[#FFF5DB] rounded-3xl p-6 sm:p-8 shadow-2xl border-4 border-[#FFDE59] overflow-hidden">
         
         {/* Close Button */}
         <button
           onClick={closeAuthModal}
           type="button"
-          aria-label="Close dialog"
-          className="absolute top-4 right-4 sm:top-5 sm:right-5 w-9 h-9 flex items-center justify-center rounded-full bg-[#81191B]/10 hover:bg-[#81191B] text-[#81191B] hover:text-[#FFDE59] transition-all duration-200 cursor-pointer"
+          className="absolute top-4 right-4 text-[#81191B] hover:text-black transition-colors p-1 rounded-full hover:bg-black/5 cursor-pointer"
         >
-          <X className="w-5 h-5" />
+          <X className="w-6 h-6" />
         </button>
 
-        {/* Modal Header */}
-        <div className="flex flex-col items-center text-center mb-5 pt-1">
-          <h3 className="font-inter font-black text-[#81191B] text-[24px] sm:text-[27px] leading-tight uppercase tracking-tight">
+        {/* Back Button for Forgot Password */}
+        {mode === "forgot" && (
+          <button
+            onClick={() => {
+              setMode("login");
+              setError("");
+              setSuccess("");
+            }}
+            type="button"
+            className="absolute top-4 left-4 text-[#81191B] hover:text-black transition-colors p-1 rounded-full hover:bg-black/5 cursor-pointer flex items-center gap-1 text-xs font-bold"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span>Back</span>
+          </button>
+        )}
+
+        {/* Header Badge */}
+        <div className="text-center mb-6">
+          <span className="inline-block bg-[#81191B] text-[#FFDE59] font-inter font-black text-[11px] sm:text-[12px] uppercase tracking-widest px-3 py-1 rounded-full mb-3 shadow-sm">
             {mode === "signup"
-              ? "Get On The List"
+              ? "Pre-Launch Exclusive"
               : mode === "forgot"
-              ? "Reset Password"
+              ? "Account Recovery"
               : "Welcome Back"}
-          </h3>
-          <p className="font-inter font-medium text-[#741117]/85 text-[13px] sm:text-[14px] mt-1 max-w-[320px] leading-snug">
+          </span>
+
+          <h3 className="font-bebas text-3xl sm:text-4xl text-[#81191B] tracking-wide uppercase leading-none">
             {mode === "signup"
-              ? "Sign up for 20% off at launch & exclusive spice drops."
+              ? "Join The Waitlist"
               : mode === "forgot"
-              ? "Enter your registered email and we will send a password reset link."
-              : "Log in to check your referrals and pre-order perks."}
+              ? "Forgot Password?"
+              : "Log In"}
+          </h3>
+
+          <p className="font-inter text-[13px] sm:text-[14px] text-[#741117] font-medium mt-1">
+            {mode === "signup"
+              ? "Get 20% OFF your first order & VIP early launch access."
+              : mode === "forgot"
+              ? "Enter your registered email and we'll send a reset link."
+              : "Sign in to check your order status, referral rewards & perks."}
           </p>
         </div>
 
-        {/* Tab Switcher OR Back Button */}
-        {mode === "forgot" ? (
-          <div className="flex justify-center mb-5">
-            <button
-              type="button"
-              onClick={() => {
-                setMode("login");
-                setError("");
-                setSuccess("");
-              }}
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#81191B] hover:text-black bg-[#81191B]/10 hover:bg-[#81191B]/20 px-3.5 py-1.5 rounded-full transition-all cursor-pointer"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Back to Log In</span>
-            </button>
-          </div>
-        ) : (
-          <div className="flex p-1 bg-[#81191B]/15 rounded-full mb-5 max-w-[280px] mx-auto">
-            <button
-              type="button"
-              onClick={() => {
-                setMode("signup");
-                setError("");
-                setSuccess("");
-              }}
-              className={`flex-1 py-1.5 text-[13px] sm:text-[14px] font-inter font-bold rounded-full transition-all duration-200 uppercase tracking-wide ${
-                mode === "signup"
-                  ? "bg-[#81191B] text-[#FFDE59] shadow-sm"
-                  : "text-[#81191B] hover:text-black cursor-pointer"
-              }`}
-            >
-              Sign Up
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setMode("login");
-                setError("");
-                setSuccess("");
-              }}
-              className={`flex-1 py-1.5 text-[13px] sm:text-[14px] font-inter font-bold rounded-full transition-all duration-200 uppercase tracking-wide ${
-                mode === "login"
-                  ? "bg-[#81191B] text-[#FFDE59] shadow-sm"
-                  : "text-[#81191B] hover:text-black cursor-pointer"
-              }`}
-            >
-              Log In
-            </button>
-          </div>
-        )}
-
-        {/* Success Alert */}
-        {success && (
-          <div className="bg-[#81191B] text-[#FFDE59] px-4 py-3 rounded-xl mb-4 text-[13px] font-semibold flex items-center gap-2 shadow-sm animate-in fade-in">
-            <CheckCircle2 className="w-5 h-5 shrink-0" />
-            <span>{success}</span>
-          </div>
-        )}
-
-        {/* Error Alert */}
+        {/* Status Messages */}
         {error && (
-          <div className="bg-red-900/90 text-white px-4 py-2.5 rounded-xl mb-4 text-[13px] font-medium flex items-center gap-2 shadow-sm animate-in fade-in">
-            <AlertCircle className="w-4 h-4 shrink-0 text-red-300" />
+          <div className="mb-4 p-3 rounded-xl bg-red-100 border border-red-300 text-red-800 text-xs sm:text-sm flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 text-red-600 mt-0.5" />
             <span>{error}</span>
           </div>
         )}
 
-        {/* Form */}
+        {success && (
+          <div className="mb-4 p-3 rounded-xl bg-green-100 border border-green-300 text-green-800 text-xs sm:text-sm flex items-start gap-2">
+            <CheckCircle2 className="w-4 h-4 shrink-0 text-green-600 mt-0.5" />
+            <span>{success}</span>
+          </div>
+        )}
+
+        {/* Form Container */}
         <form
           onSubmit={
             mode === "signup"
@@ -444,64 +416,56 @@ export default function AuthModal() {
               ? handleForgotPassword
               : handleLogin
           }
-          className="space-y-3"
+          className="space-y-3.5"
         >
-          {/* Sign Up Fields */}
+          {/* Full Name (Sign Up only) */}
           {mode === "signup" && (
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                <User className="h-4 w-4 text-[#81191B]/60" />
+            <div>
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-[#741117] mb-1">
+                Your Name
+              </label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                  placeholder="e.g. Tenzin Norbu"
+                  className="w-full bg-white text-[#2B0B0E] placeholder:text-gray-400 text-sm font-medium rounded-xl pl-9 pr-3 py-2.5 border-2 border-[#81191B]/20 focus:outline-none focus:border-[#81191B] transition-colors"
+                />
               </div>
-              <input
-                type="text"
-                name="name"
-                required
-                value={formData.name}
-                onChange={handleChange}
-                placeholder="Full Name"
-                className="w-full pl-10 pr-3.5 py-2.5 bg-[#FFFBF0] border border-[#81191B]/30 focus:border-[#81191B] text-[#580F13] placeholder-[#81191B]/50 rounded-xl text-[14px] font-medium outline-none transition-all shadow-inner"
-              />
             </div>
           )}
 
-          {/* Email Field (All Modes) */}
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-              <Mail className="h-4 w-4 text-[#81191B]/60" />
+          {/* Email Address (All modes) */}
+          <div>
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-[#741117] mb-1">
+              Email Address
+            </label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                placeholder="you@domain.com"
+                className="w-full bg-white text-[#2B0B0E] placeholder:text-gray-400 text-sm font-medium rounded-xl pl-9 pr-3 py-2.5 border-2 border-[#81191B]/20 focus:outline-none focus:border-[#81191B] transition-colors"
+              />
             </div>
-            <input
-              type="email"
-              name="email"
-              required
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Email Address"
-              className="w-full pl-10 pr-3.5 py-2.5 bg-[#FFFBF0] border border-[#81191B]/30 focus:border-[#81191B] text-[#580F13] placeholder-[#81191B]/50 rounded-xl text-[14px] font-medium outline-none transition-all shadow-inner"
-            />
           </div>
 
-          {/* Password Field (Signup and Login Only) */}
+          {/* Password (Signup & Login) */}
           {mode !== "forgot" && (
-            <div className="space-y-1">
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                  <Lock className="h-4 w-4 text-[#81191B]/60" />
-                </div>
-                <input
-                  type="password"
-                  name="password"
-                  required
-                  minLength={6}
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder={mode === "signup" ? "Enter a New password" : "Password"}
-                  className="w-full pl-10 pr-3.5 py-2.5 bg-[#FFFBF0] border border-[#81191B]/30 focus:border-[#81191B] text-[#580F13] placeholder-[#81191B]/50 rounded-xl text-[14px] font-medium outline-none transition-all shadow-inner"
-                />
-              </div>
-
-              {/* Forgot Password Link in Login Mode */}
-              {mode === "login" && (
-                <div className="flex justify-end pt-0.5">
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-[#741117]">
+                  Password
+                </label>
+                {mode === "login" && (
                   <button
                     type="button"
                     onClick={() => {
@@ -509,33 +473,66 @@ export default function AuthModal() {
                       setError("");
                       setSuccess("");
                     }}
-                    className="text-[12px] font-bold text-[#81191B]/90 hover:text-[#81191B] hover:underline cursor-pointer transition-colors"
+                    className="text-[11px] font-bold text-[#81191B] hover:underline cursor-pointer"
                   >
                     Forgot Password?
                   </button>
-                </div>
-              )}
+                )}
+              </div>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  minLength={6}
+                  placeholder="At least 6 characters"
+                  className="w-full bg-white text-[#2B0B0E] placeholder:text-gray-400 text-sm font-medium rounded-xl pl-9 pr-3 py-2.5 border-2 border-[#81191B]/20 focus:outline-none focus:border-[#81191B] transition-colors"
+                />
+              </div>
             </div>
           )}
 
-          {/* Referral Code Field (Sign Up Only) */}
+          {/* WhatsApp / Phone (Sign Up only) */}
           {mode === "signup" && (
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                <Gift className="h-4 w-4 text-[#81191B]/60" />
-              </div>
+            <div>
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-[#741117] mb-1">
+                WhatsApp / Phone <span className="normal-case opacity-70">(Optional)</span>
+              </label>
               <input
-                type="text"
-                name="referralCode"
-                value={formData.referralCode}
+                type="tel"
+                name="phone"
+                value={formData.phone}
                 onChange={handleChange}
-                placeholder="Referral Code (Optional)"
-                className="w-full pl-10 pr-3.5 py-2.5 bg-[#FFFBF0] border border-[#81191B]/30 focus:border-[#81191B] text-[#580F13] placeholder-[#81191B]/50 rounded-xl text-[14px] font-medium outline-none transition-all shadow-inner"
+                placeholder="+91 98765 43210"
+                className="w-full bg-white text-[#2B0B0E] placeholder:text-gray-400 text-sm font-medium rounded-xl px-3 py-2.5 border-2 border-[#81191B]/20 focus:outline-none focus:border-[#81191B] transition-colors"
               />
             </div>
           )}
 
-          {/* Consent Checkbox (Sign Up Only) */}
+          {/* Referral Code (Sign Up only) */}
+          {mode === "signup" && (
+            <div>
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-[#741117] mb-1">
+                Referral Code <span className="normal-case opacity-70">(Optional)</span>
+              </label>
+              <div className="relative">
+                <Gift className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#81191B]" />
+                <input
+                  type="text"
+                  name="referralCode"
+                  value={formData.referralCode}
+                  onChange={handleChange}
+                  placeholder="e.g. FRIEND20"
+                  className="w-full bg-white text-[#2B0B0E] placeholder:text-gray-400 text-sm font-medium rounded-xl pl-9 pr-3 py-2.5 border-2 border-[#81191B]/20 focus:outline-none focus:border-[#81191B] transition-colors uppercase"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Consent Checkbox (Sign Up only) */}
           {mode === "signup" && (
             <div className="flex items-start gap-2.5 pt-1 pb-1">
               <input

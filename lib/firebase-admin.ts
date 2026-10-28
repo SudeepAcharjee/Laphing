@@ -60,13 +60,18 @@ export function getAdminApp(): App | null {
  * Generates a password reset link for the given email using Firebase Admin SDK.
  * Returns the exact action link (e.g. https://laphing-6803d.firebaseapp.com/__/auth/action?mode=resetPassword&oobCode=...)
  */
-export async function generatePasswordResetLink(email: string): Promise<string | null> {
+export async function generatePasswordResetLink(
+  email: string,
+  actionCodeSettings?: { url: string; handleCodeInApp?: boolean }
+): Promise<string | null> {
   const app = getAdminApp();
   if (!app) return null;
 
   try {
     const auth = getAuth(app);
-    const link = await auth.generatePasswordResetLink(email);
+    const link = actionCodeSettings
+      ? await auth.generatePasswordResetLink(email, actionCodeSettings)
+      : await auth.generatePasswordResetLink(email);
     return link;
   } catch (error: any) {
     console.warn("Firebase Admin generatePasswordResetLink notice:", error.message);

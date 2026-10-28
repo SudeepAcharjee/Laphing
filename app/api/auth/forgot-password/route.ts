@@ -16,8 +16,20 @@ export async function POST(request: Request) {
 
     const cleanEmail = email.trim().toLowerCase();
 
+    // Determine the base site URL
+    const baseUrl =
+      process.env.NEXT_PUBLIC_SITE_URL ||
+      process.env.NEXTAUTH_URL ||
+      "https://laphing-website.vercel.app";
+
+    // ActionCodeSettings to route directly to our custom reset page
+    const actionCodeSettings = {
+      url: `${baseUrl}/reset-password`,
+      handleCodeInApp: true,
+    };
+
     // 1. Try generating the Firebase password reset link using Admin SDK
-    const resetLink = await generatePasswordResetLink(cleanEmail);
+    const resetLink = await generatePasswordResetLink(cleanEmail, actionCodeSettings);
 
     if (!resetLink) {
       // If Admin credentials are not set up in env, tell client to use client SDK
@@ -58,11 +70,10 @@ export async function POST(request: Request) {
       message: "Branded password reset email sent successfully.",
     });
   } catch (error: any) {
-    console.error("Forgot password API error:", error);
-    // If anything fails on the server, allow client-side fallback
-    return NextResponse.json({
-      fallbackToClient: true,
-      error: error.message,
-    });
+    console.error("Forgot password route error:", error);
+    return NextResponse.json(
+      { error: error.message || "Failed to process forgot password request." },
+      { status: 500 }
+    );
   }
 }
