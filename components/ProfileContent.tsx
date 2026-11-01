@@ -84,16 +84,41 @@ export default function ProfileContent() {
 
           // Fetch User Orders
           try {
-            const ordersQ = query(
-              collection(db, "orders"),
-              where("userId", "==", currentUser.uid)
-            );
-            const ordersSnap = await getDocs(ordersQ);
-            const ordersData: any[] = [];
-            ordersSnap.forEach((docSnap) => {
-              ordersData.push({ id: docSnap.id, ...docSnap.data() });
-            });
+            const ordersMap = new Map<string, any>();
 
+            // 1. Query by userId
+            try {
+              const ordersQ = query(
+                collection(db, "orders"),
+                where("userId", "==", currentUser.uid)
+              );
+              const ordersSnap = await getDocs(ordersQ);
+              ordersSnap.forEach((docSnap) => {
+                ordersMap.set(docSnap.id, { id: docSnap.id, ...docSnap.data() });
+              });
+            } catch (qErr) {
+              console.warn("Could not query orders by userId:", qErr);
+            }
+
+            // 2. Also query by customer email
+            if (currentUser.email) {
+              try {
+                const emailQ = query(
+                  collection(db, "orders"),
+                  where("customerDetails.email", "==", currentUser.email.toLowerCase())
+                );
+                const emailSnap = await getDocs(emailQ);
+                emailSnap.forEach((docSnap) => {
+                  if (!ordersMap.has(docSnap.id)) {
+                    ordersMap.set(docSnap.id, { id: docSnap.id, ...docSnap.data() });
+                  }
+                });
+              } catch (qErr) {
+                console.warn("Could not query orders by email:", qErr);
+              }
+            }
+
+            const ordersData = Array.from(ordersMap.values());
             ordersData.sort((a, b) => {
               const timeA = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
               const timeB = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;

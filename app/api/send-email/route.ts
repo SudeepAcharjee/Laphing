@@ -3,6 +3,7 @@ import nodemailer from "nodemailer";
 import {
   renderMasterEmail,
   getWelcomeEmailHtml,
+  getOrderConfirmationEmailHtml,
   getOrderStatusEmailHtml,
   getBroadcastEmailHtml,
 } from "@/lib/email-templates";
@@ -21,6 +22,11 @@ export async function POST(request: Request) {
       discountPercent,
       orderId,
       newStatus,
+      totalAmount,
+      quantity,
+      productName,
+      paymentId,
+      address,
     } = body;
 
     if (!to) {
@@ -44,6 +50,19 @@ export async function POST(request: Request) {
       finalSubject = finalSubject || welcome.subject;
       finalHtml = welcome.html;
       finalText = welcome.text;
+    } else if (type === "order_confirmation") {
+      const orderConfirm = getOrderConfirmationEmailHtml({
+        orderId: orderId || "",
+        customerName: name || "",
+        totalAmount,
+        quantity,
+        productName,
+        paymentId,
+        address,
+      });
+      finalSubject = finalSubject || orderConfirm.subject;
+      finalHtml = orderConfirm.html;
+      finalText = orderConfirm.text;
     } else if (type === "order_status") {
       const orderUpdate = getOrderStatusEmailHtml({
         orderId: orderId || "",

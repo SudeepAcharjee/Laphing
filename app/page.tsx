@@ -159,7 +159,7 @@ export default function Home() {
             style={{ left: '30%', right: '30%', top: '4.5%' }}
           >
             <span className="font-inter font-bold text-[#81191B] text-[15px] sm:text-[16px] leading-[19px] tracking-wider uppercase block">
-              WHAT GOES INTO THE GOOD STUFF
+             What goes into the spicy stuff
             </span>
           </div>
 
@@ -169,7 +169,7 @@ export default function Home() {
             style={{ left: '15%', right: '15%', top: '6.8%' }}
           >
             <h2 className="font-inter font-black text-[#81191B] text-[48px] lg:text-[64px] leading-tight tracking-tight block">
-              What’s inside this Baddie?
+            What's inside this Pack?
             </h2>
           </div>
 
@@ -178,9 +178,7 @@ export default function Home() {
             className="absolute text-center z-20 pointer-events-none"
             style={{ left: '25%', right: '25%', top: '14.5%' }}
           >
-            <p className="font-inter font-medium text-[#81191B] text-[19px] lg:text-[21px] leading-[26px] block">
-              Six little personalities. One big craving.
-            </p>
+            
           </div>
 
           {/* Center Pouch (/about/center.png) */}
@@ -989,7 +987,7 @@ export default function Home() {
           <div className="relative w-full pt-6 sm:pt-10 md:pt-12 flex items-center justify-center">
             {/* Bottom Centered Text */}
             <p className="font-inter font-medium text-[#81191B] text-[13px] sm:text-[15px] md:text-[16px] text-center">
-              From our kitchen to your next craving.
+            Make spicy, saucey authentic laphing at home in 5 minutes. 
             </p>
           </div>
 

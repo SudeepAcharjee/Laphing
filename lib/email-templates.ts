@@ -10,7 +10,7 @@
  * Standards:
  * - Table-based responsive email HTML compatible with Gmail, Apple Mail, Outlook, Yahoo
  * - Brand styling with typography, styled badges, rounded cards, and high-contrast CTA buttons
- * - Sign-off: "Regards,\nDe Laphing Team" across all emails
+ * - Sign-off: "Warm regards,\nDe Laphing Team" across all emails
  */
 
 export const BRAND_LOGO_URL =
@@ -49,7 +49,7 @@ export function renderMasterEmail({
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="light" />
   <meta name="supported-color-schemes" content="light" />
-  <title>de Laphing co.</title>
+  <title>De Laphing Co.</title>
   <!--[if mso]>
   <style type="text/css">
     body, table, td, p, a {font-family: Arial, sans-serif !important;}
@@ -88,7 +88,7 @@ export function renderMasterEmail({
                 <tr>
                   <td align="center">
                     <div style="font-family: Impact, Arial Black, sans-serif; font-size: 32px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; line-height: 1;">
-                      <span style="color: #FFDE59;">THE </span><span style="color: #FFFFFF;">LAPHING CO.</span>
+                      <span style="color: #FFDE59;">DE </span><span style="color: #FFFFFF;">LAPHING CO.</span>
                     </div>
                   </td>
                 </tr>
@@ -183,7 +183,7 @@ export function renderMasterEmail({
           <tr>
             <td style="background-color: #FAF4EB; padding: 24px 28px; text-align: center; border-top: 2px solid #EEDFCE;">
               <p style="margin: 0 0 6px 0; font-size: 12.5px; font-weight: 800; color: #741117; text-transform: uppercase; letter-spacing: 1px;">
-                THE LAPHING CO. • AUTHENTIC TIBETAN STREET FOOD
+                DE LAPHING CO. • AUTHENTIC TIBETAN STREET FOOD
               </p>
               <p style="margin: 0 0 10px 0; font-size: 12px; line-height: 1.5; color: #7A5B5D;">
                 Majnu-ka-tilla style cold noodles with artisanal chilli oil, savory soy chunks & crispy Wai Wai crunch.<br />
@@ -193,7 +193,7 @@ export function renderMasterEmail({
                 Need help? Contact us: <a href="mailto:delaphingcompany@gmail.com" style="color: #741117; font-weight: 700; text-decoration: underline;">delaphingcompany@gmail.com</a>
               </div>
               <p style="margin: 12px 0 0 0; font-size: 11px; color: #9E8183;">
-                © ${new Date().getFullYear()} The Laphing Co. All rights reserved.
+                © ${new Date().getFullYear()} De Laphing Co. All rights reserved.
               </p>
             </td>
           </tr>
@@ -222,14 +222,14 @@ export function getWelcomeEmailHtml({
   discountPercent?: number;
 }): { subject: string; html: string; text: string } {
   const firstName = name?.trim() ? name.trim().split(" ")[0] : "Friend";
-  const subject = `Welcome to The Laphing Co.! Here is your ${discountPercent}% OFF 🎉`;
+  const subject = `Welcome to De Laphing Co.! Here is your ${discountPercent}% OFF 🎉`;
 
   const bodyHtml = `
     <p style="margin: 0 0 14px 0; font-size: 16px; color: #2D1416;">
       Hey <strong>${firstName}</strong>,
     </p>
     <p style="margin: 0 0 16px 0; color: #4A2628;">
-      You're officially on the VIP list at <strong>The Laphing Co.</strong>! We're bringing the authentic street-style Tibetan cold laphing of Majnu Ka Tilla straight to your kitchen — complete with our signature fiery garlic chilli oil, soy nuggets, and crunchy Wai Wai noodles.
+      You're officially on the VIP list at <strong>De Laphing Co.</strong>! We're bringing the authentic street-style Tibetan cold laphing of Majnu Ka Tilla straight to your kitchen — complete with our signature fiery garlic chilli oil, soy nuggets, and crunchy Wai Wai noodles.
     </p>
 
     <!-- 20% OFF Promo Card -->
@@ -293,7 +293,7 @@ export function getWelcomeEmailHtml({
     bodyHtml,
   });
 
-  const text = `Welcome to The Laphing Co.!\n\nHey ${firstName},\n\nYou have unlocked ${discountPercent}% OFF on your order!\n${
+  const text = `Welcome to De Laphing Co.!\n\nHey ${firstName},\n\nYou have unlocked ${discountPercent}% OFF on your order!\n${
     referralCode
       ? `Your unique referral code is: ${referralCode.toUpperCase()}\nShare with 2 friends to unlock an extra +10% OFF (total 30% discount!)\n`
       : ""
@@ -312,14 +312,14 @@ export function getPasswordResetEmailHtml({
   email: string;
   resetLink: string;
 }): { subject: string; html: string; text: string } {
-  const subject = "Reset Your Password - The Laphing Co.";
+  const subject = "Reset Your Password - De Laphing Co.";
 
   const bodyHtml = `
     <p style="margin: 0 0 14px 0; font-size: 16px; color: #2D1416;">
       Hello,
     </p>
     <p style="margin: 0 0 16px 0; color: #4A2628;">
-      We received a request to reset the password for your <strong>The Laphing Co.</strong> account registered under <strong style="color: #741117;">${email}</strong>.
+      We received a request to reset the password for your <strong>De Laphing Co.</strong> account registered under <strong style="color: #741117;">${email}</strong>.
     </p>
     <p style="margin: 0 0 20px 0; color: #4A2628;">
       Click the button below to choose a new password and get back to your spicy cravings:
@@ -347,7 +347,7 @@ export function getPasswordResetEmailHtml({
   `;
 
   const html = renderMasterEmail({
-    preheader: "Reset your password for The Laphing Co. - link expires in 1 hour",
+    preheader: "Reset your password for De Laphing Co. - link expires in 1 hour",
     badgeText: "Security Verification",
     headline: "Reset Your Password",
     bodyHtml,
@@ -359,13 +359,125 @@ export function getPasswordResetEmailHtml({
     footerNote: `Need assistance? Reply directly to this email or contact <a href="mailto:delaphingcompany@gmail.com" style="color: #741117; font-weight: 700;">delaphingcompany@gmail.com</a>.<br /><br />Warm regards,<br /><strong style="color: #741117; font-size: 15.5px;">De Laphing Team</strong>`,
   });
 
-  const text = `Reset your password - The Laphing Co.\n\nHello,\n\nWe received a request to reset your password for ${email}.\n\nOpen this link to reset your password:\n${resetLink}\n\nThis link will expire in 1 hour. If you didn't request this, you can ignore this email.\n\nWarm regards,\nDe Laphing Team`;
+  const text = `Reset your password - De Laphing Co.\n\nHello,\n\nWe received a request to reset your password for ${email}.\n\nOpen this link to reset your password:\n${resetLink}\n\nThis link will expire in 1 hour. If you didn't request this, you can ignore this email.\n\nWarm regards,\nDe Laphing Team`;
 
   return { subject, html, text };
 }
 
 /**
- * 3. Order Status Email
+ * 3. Order Confirmation Email (Sent immediately upon successful payment / order)
+ */
+export function getOrderConfirmationEmailHtml({
+  orderId,
+  customerName,
+  totalAmount,
+  quantity = 1,
+  productName = "Laphing Signature Pack",
+  paymentId,
+  address,
+}: {
+  orderId: string;
+  customerName?: string;
+  totalAmount?: number;
+  quantity?: number;
+  productName?: string;
+  paymentId?: string;
+  address?: string;
+}): { subject: string; html: string; text: string } {
+  const shortId = orderId ? orderId.slice(0, 8).toUpperCase() : "";
+  const firstName = customerName?.trim() ? customerName.trim().split(" ")[0] : "Friend";
+  const subject = `Order Confirmed! #${shortId} - De Laphing Co. 🎉`;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://delaphingcompany.com";
+
+  const bodyHtml = `
+    <p style="margin: 0 0 14px 0; font-size: 16px; color: #2D1416;">
+      Hey <strong>${firstName}</strong>,
+    </p>
+    <p style="margin: 0 0 16px 0; color: #4A2628;">
+      Thank you for your order with <strong>De Laphing Co.</strong>! We have received your payment and our kitchen team is handcrafting your authentic Tibetan cold laphing kit with fresh artisanal chilli oil and savory soy chunks.
+    </p>
+
+    <!-- Order Receipt Card (Matching VIP Signup Format) -->
+    <div style="background: linear-gradient(135deg, #FFF9E6 0%, #FFF3CC 100%); border: 2.5px dashed #FFDE59; border-radius: 18px; padding: 22px 20px; margin: 24px 0; box-shadow: 0 4px 14px rgba(255, 222, 89, 0.25);">
+      <div style="color: #741117; font-size: 11px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; text-align: center;">
+        ORDER RECEIPT & VERIFICATION
+      </div>
+      <div style="color: #741117; font-size: 38px; font-weight: 900; line-height: 1.1; margin: 8px 0 4px 0; text-align: center;">
+        ₹${totalAmount || 0}
+      </div>
+      <div style="color: #520C11; font-size: 13px; font-weight: 700; text-align: center; margin-bottom: 16px;">
+        Payment Confirmed • Fresh Batch Preparing
+      </div>
+
+      <!-- Receipt Breakdown Table -->
+      <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-top: 1.5px solid rgba(116, 17, 23, 0.15); padding-top: 14px; font-size: 13px; color: #4A2628;">
+        <tr>
+          <td style="padding: 6px 0; color: #7A5B5D; font-weight: 600;">Order ID:</td>
+          <td align="right" style="padding: 6px 0; font-weight: 800; color: #741117; font-family: monospace; font-size: 14px;">#${shortId}</td>
+        </tr>
+        ${
+          paymentId
+            ? `
+        <tr>
+          <td style="padding: 6px 0; color: #7A5B5D; font-weight: 600;">Payment Reference:</td>
+          <td align="right" style="padding: 6px 0; font-weight: 700; color: #741117; font-family: monospace; font-size: 12px;">${paymentId}</td>
+        </tr>`
+            : ""
+        }
+        <tr>
+          <td style="padding: 6px 0; color: #7A5B5D; font-weight: 600;">Items:</td>
+          <td align="right" style="padding: 6px 0; font-weight: 800; color: #2D1416;">${quantity}x ${productName}</td>
+        </tr>
+        ${
+          address
+            ? `
+        <tr>
+          <td style="padding: 6px 0; color: #7A5B5D; font-weight: 600; vertical-align: top;">Delivery Address:</td>
+          <td align="right" style="padding: 6px 0; font-weight: 600; color: #2D1416; max-width: 250px;">${address}</td>
+        </tr>`
+            : ""
+        }
+      </table>
+    </div>
+
+    <!-- Quick Features -->
+    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 22px 0 10px 0; border-collapse: separate; border-spacing: 8px 0;">
+      <tr>
+        <td align="center" style="background-color: #FAF4EB; padding: 12px 8px; border-radius: 10px; border: 1px solid #EEDFCE; width: 33.3%;">
+          <div style="font-size: 18px; margin-bottom: 2px;">🍜</div>
+          <div style="font-size: 11.5px; font-weight: 800; color: #741117; text-transform: uppercase;">Pack of 3</div>
+        </td>
+        <td align="center" style="background-color: #FAF4EB; padding: 12px 8px; border-radius: 10px; border: 1px solid #EEDFCE; width: 33.3%;">
+          <div style="font-size: 18px; margin-bottom: 2px;">⚡</div>
+          <div style="font-size: 11.5px; font-weight: 800; color: #741117; text-transform: uppercase;">Ready in 5 Mins</div>
+        </td>
+        <td align="center" style="background-color: #FAF4EB; padding: 12px 8px; border-radius: 10px; border: 1px solid #EEDFCE; width: 33.3%;">
+          <div style="font-size: 18px; margin-bottom: 2px;">❄️</div>
+          <div style="font-size: 11.5px; font-weight: 800; color: #741117; text-transform: uppercase;">Delivered Cold</div>
+        </td>
+      </tr>
+    </table>
+  `;
+
+  const html = renderMasterEmail({
+    preheader: `Your order #${shortId} is confirmed! Total paid: ₹${totalAmount || 0}.`,
+    badgeText: "Order Confirmed",
+    headline: "Your Order Is In The Kitchen!",
+    bodyHtml,
+    actionButton: {
+      text: "Track in My Orders",
+      url: `${siteUrl}/dashboard`,
+      subtitle: "View live order progress & dispatch updates",
+    },
+  });
+
+  const text = `Order Confirmed! #${shortId}\n\nHey ${firstName},\n\nThank you for ordering with De Laphing Co.! We have received your payment of ₹${totalAmount || 0}.\n\nOrder ID: #${shortId}\nItems: ${quantity}x ${productName}\nDelivery Address: ${address || "On file"}\n\nTrack your order: ${siteUrl}/dashboard\n\nWarm regards,\nDe Laphing Team`;
+
+  return { subject, html, text };
+}
+
+/**
+ * 4. Order Status Email (Sent when Admin updates status: Processing, Packed, Shipped, Delivered)
  */
 export function getOrderStatusEmailHtml({
   orderId,
@@ -377,18 +489,20 @@ export function getOrderStatusEmailHtml({
   newStatus: string;
 }): { subject: string; html: string; text: string } {
   const shortId = orderId ? orderId.slice(0, 8).toUpperCase() : "";
-  const subject = `Order #${shortId} Update: ${newStatus} - The Laphing Co.`;
+  const firstName = customerName?.trim() ? customerName.trim().split(" ")[0] : "Customer";
+  const subject = `Order #${shortId} Update: ${newStatus} - De Laphing Co.`;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://delaphingcompany.com";
 
   const bodyHtml = `
     <p style="margin: 0 0 14px 0; font-size: 16px; color: #2D1416;">
-      Dear <strong>${customerName || "Customer"}</strong>,
+      Hey <strong>${firstName}</strong>,
     </p>
     <p style="margin: 0 0 16px 0; color: #4A2628;">
-      Great news! There is an update regarding your cold laphing kit order <strong>#${shortId}</strong>.
+      Great news! There is a live status update regarding your authentic Tibetan cold laphing order <strong>#${shortId}</strong>.
     </p>
 
-    <!-- Status Card -->
-    <div style="background: linear-gradient(135deg, #FFF9E6 0%, #FFF3CC 100%); border: 2px solid #FFDE59; border-radius: 18px; padding: 24px 20px; text-align: center; margin: 24px 0; box-shadow: 0 4px 14px rgba(255, 222, 89, 0.25);">
+    <!-- Status Card (Matching VIP Signup Format) -->
+    <div style="background: linear-gradient(135deg, #FFF9E6 0%, #FFF3CC 100%); border: 2.5px solid #FFDE59; border-radius: 18px; padding: 24px 20px; text-align: center; margin: 24px 0; box-shadow: 0 4px 14px rgba(255, 222, 89, 0.25);">
       <div style="color: #741117; font-size: 11px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase;">
         CURRENT STATUS
       </div>
@@ -400,12 +514,23 @@ export function getOrderStatusEmailHtml({
       </div>
     </div>
 
-    <p style="margin: 0 0 14px 0; font-size: 14.5px; line-height: 1.6; color: #4A2628;">
-      Each kit is vacuum-sealed and temperature-controlled with our authentic Majnu Ka Tilla street seasoning.
-    </p>
-    <p style="margin: 0; font-size: 13px; color: #7A5B5D;">
-      Have questions about delivery? Reply directly to this email anytime and our kitchen team will assist you.
-    </p>
+    <!-- Quick Features -->
+    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 22px 0 10px 0; border-collapse: separate; border-spacing: 8px 0;">
+      <tr>
+        <td align="center" style="background-color: #FAF4EB; padding: 12px 8px; border-radius: 10px; border: 1px solid #EEDFCE; width: 33.3%;">
+          <div style="font-size: 18px; margin-bottom: 2px;">🍜</div>
+          <div style="font-size: 11.5px; font-weight: 800; color: #741117; text-transform: uppercase;">Pack of 3</div>
+        </td>
+        <td align="center" style="background-color: #FAF4EB; padding: 12px 8px; border-radius: 10px; border: 1px solid #EEDFCE; width: 33.3%;">
+          <div style="font-size: 18px; margin-bottom: 2px;">⚡</div>
+          <div style="font-size: 11.5px; font-weight: 800; color: #741117; text-transform: uppercase;">Ready in 5 Mins</div>
+        </td>
+        <td align="center" style="background-color: #FAF4EB; padding: 12px 8px; border-radius: 10px; border: 1px solid #EEDFCE; width: 33.3%;">
+          <div style="font-size: 18px; margin-bottom: 2px;">❄️</div>
+          <div style="font-size: 11.5px; font-weight: 800; color: #741117; text-transform: uppercase;">Delivered Cold</div>
+        </td>
+      </tr>
+    </table>
   `;
 
   const html = renderMasterEmail({
@@ -413,15 +538,20 @@ export function getOrderStatusEmailHtml({
     badgeText: "Order Tracking",
     headline: "Order Status Update",
     bodyHtml,
+    actionButton: {
+      text: "Track in My Orders",
+      url: `${siteUrl}/dashboard`,
+      subtitle: "View your order history & live tracking",
+    },
   });
 
-  const text = `Order #${shortId} Status Update: ${newStatus}\n\nDear ${customerName || "Customer"},\n\nYour order #${shortId} has been updated to: ${newStatus}.\n\nWarm regards,\nDe Laphing Team`;
+  const text = `Order #${shortId} Status Update: ${newStatus}\n\nHey ${firstName},\n\nYour order #${shortId} has been updated to: ${newStatus}.\n\nView details: ${siteUrl}/dashboard\n\nWarm regards,\nDe Laphing Team`;
 
   return { subject, html, text };
 }
 
 /**
- * 4. General Admin Broadcast Email
+ * 5. General Admin Broadcast Email
  */
 export function getBroadcastEmailHtml({
   subject,
@@ -445,7 +575,7 @@ export function getBroadcastEmailHtml({
   });
 
   return {
-    subject: `${subject} - The Laphing Co.`,
+    subject: `${subject} - De Laphing Co.`,
     html,
     text: `${message}\n\nWarm regards,\nDe Laphing Team`,
   };

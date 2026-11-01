@@ -1,20 +1,59 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, collection, getDocs, deleteDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { Save, Loader2, CheckSquare, Settings } from "lucide-react";
+import { Save, Loader2, CheckSquare, Settings, Trash2, AlertTriangle } from "lucide-react";
 
 export default function AdminSettings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [clearingData, setClearingData] = useState(false);
+  const [dangerMsg, setDangerMsg] = useState("");
   
   const [settings, setSettings] = useState({
     preLaunchDiscount: 20,
     referralDiscount: 10,
     maxReferrals: 2,
   });
+
+  const handleClearTestData = async () => {
+    const confirmed = window.confirm(
+      "Are you sure you want to permanently delete ALL testing data from Users, Signups, and Orders? Settings will NOT be deleted."
+    );
+    if (!confirmed) return;
+
+    setClearingData(true);
+    setDangerMsg("");
+
+    try {
+      // 1. Delete users
+      const usersSnap = await getDocs(collection(db, "users"));
+      for (const d of usersSnap.docs) {
+        await deleteDoc(doc(db, "users", d.id));
+      }
+
+      // 2. Delete signups
+      const signupsSnap = await getDocs(collection(db, "signups"));
+      for (const d of signupsSnap.docs) {
+        await deleteDoc(doc(db, "signups", d.id));
+      }
+
+      // 3. Delete orders
+      const ordersSnap = await getDocs(collection(db, "orders"));
+      for (const d of ordersSnap.docs) {
+        await deleteDoc(doc(db, "orders", d.id));
+      }
+
+      setDangerMsg("All testing data from users, signups, and orders was successfully cleared!");
+    } catch (err: any) {
+      console.error("Error clearing test data:", err);
+      alert("Failed to delete test data: " + (err.message || "Unknown error"));
+    } finally {
+      setClearingData(false);
+    }
+  };
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -163,6 +202,41 @@ export default function AdminSettings() {
             </button>
           </div>
         </form>
+      </div>
+
+      {/* Danger Zone: Reset Test Data */}
+      <div className="bg-[#2D0A0D] border border-red-900/40 rounded-2xl p-6 md:p-8 shadow-xl">
+        <div className="flex items-center gap-2.5 text-red-400 font-bold mb-2">
+          <AlertTriangle className="w-5 h-5 text-red-400" />
+          <h2 className="text-base text-red-300 font-bold uppercase tracking-wider">Danger Zone</h2>
+        </div>
+        <p className="text-sm text-yellow-100/60 mb-5">
+          Permanently delete all mock/testing entries from <strong>Users</strong>, <strong>Signups</strong>, and <strong>Orders</strong>. Global settings and configurations will be preserved.
+        </p>
+        {dangerMsg && (
+          <div className="bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 p-3.5 rounded-xl text-xs font-semibold mb-4 flex items-center gap-2">
+            <CheckSquare className="w-4 h-4 text-emerald-400 shrink-0" />
+            {dangerMsg}
+          </div>
+        )}
+        <button
+          type="button"
+          onClick={handleClearTestData}
+          disabled={clearingData}
+          className="bg-red-600/20 hover:bg-red-600 border border-red-500/40 text-red-200 hover:text-white font-bold py-2.5 px-5 rounded-xl transition-all flex items-center gap-2 text-sm disabled:opacity-40 cursor-pointer active:scale-95"
+        >
+          {clearingData ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Deleting test data...
+            </>
+          ) : (
+            <>
+              <Trash2 className="w-4 h-4" />
+              Delete All Testing Data
+            </>
+          )}
+        </button>
       </div>
     </div>
   );

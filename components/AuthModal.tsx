@@ -463,7 +463,7 @@ export default function AuthModal() {
             <div>
               <div className="flex items-center justify-between mb-1">
                 <label className="block text-[11px] font-bold uppercase tracking-wider text-[#741117]">
-                  Password
+                  {mode === "signup" ? "Create your Password" : "Password"}
                 </label>
                 {mode === "login" && (
                   <button
@@ -488,27 +488,10 @@ export default function AuthModal() {
                   onChange={handleChange}
                   required
                   minLength={6}
-                  placeholder="At least 6 characters"
+                  placeholder={mode === "signup" ? "Create your password" : "At least 6 characters"}
                   className="w-full bg-white text-[#2B0B0E] placeholder:text-gray-400 text-sm font-medium rounded-xl pl-9 pr-3 py-2.5 border-2 border-[#81191B]/20 focus:outline-none focus:border-[#81191B] transition-colors"
                 />
               </div>
-            </div>
-          )}
-
-          {/* WhatsApp / Phone (Sign Up only) */}
-          {mode === "signup" && (
-            <div>
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-[#741117] mb-1">
-                WhatsApp / Phone <span className="normal-case opacity-70">(Optional)</span>
-              </label>
-              <input
-                type="tel"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                placeholder="+91 98765 43210"
-                className="w-full bg-white text-[#2B0B0E] placeholder:text-gray-400 text-sm font-medium rounded-xl px-3 py-2.5 border-2 border-[#81191B]/20 focus:outline-none focus:border-[#81191B] transition-colors"
-              />
             </div>
           )}
 

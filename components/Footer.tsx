@@ -56,7 +56,7 @@ export default function Footer() {
                 ACCESSIBILITY
               </Link>
               <span className="text-[11px] sm:text-[12px] md:text-[13px] text-[#FFF5DB]/60 tracking-normal font-inter sm:self-center leading-relaxed">
-                © 2026 — The Laphing Co. • Majnu-ka-tilla, New Delhi • All Rights Reserved
+                © 2026 — De Laphing Co.  All Rights Reserved
               </span>
             </div>
           </nav>
