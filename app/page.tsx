@@ -371,14 +371,11 @@ export default function Home() {
           {/* Mobile Header */}
           <div className="text-center mb-4 px-3">
             <span className="font-inter font-bold text-[#81191B] text-[11px] tracking-widest uppercase block mb-1">
-              WHAT GOES INTO THE GOOD STUFF
+              What goes into the spicy stuff
             </span>
-            <h2 className="font-inter font-black text-[#81191B] text-[26px] xs:text-[30px] leading-[1.08] tracking-tight block mb-1.5">
-              What’s inside this Baddie?
+            <h2 className="font-inter font-black text-[#81191B] text-[26px] xs:text-[30px] leading-[1.08] tracking-tight block">
+              What's inside this Pack?
             </h2>
-            <p className="font-inter font-medium text-[#81191B] text-[13px] xs:text-[14px] block">
-              Six little personalities. One big craving.
-            </p>
           </div>
 
           {/* Mobile Interactive Stage - 1:1 Matching Desktop Layout */}
