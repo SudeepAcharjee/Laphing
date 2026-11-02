@@ -921,14 +921,14 @@ export default function Home() {
             {/* Left Polaroid */}
             <div className="relative w-full max-w-[290px] xs:max-w-[330px] sm:max-w-[390px] md:max-w-[440px] lg:max-w-[465px] bg-[#FFF5DB] border-[1.5px] border-[#81191B] rounded-[6px] p-3.5 xs:p-4 sm:p-5 pb-5 sm:pb-7 shadow-[0_12px_28px_rgba(129,25,27,0.12)] transition-transform duration-300 hover:scale-[1.02] cursor-pointer rotate-[-1.5deg] md:rotate-[-3.5deg]">
               {/* Photo Area */}
-              <div className="relative w-full aspect-[4/3.8] bg-[#E7D5B7] border border-[#81191B]/40 flex flex-col items-center justify-center p-4">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#81191B" strokeWidth="2.2" strokeLinecap="round">
-                  <line x1="12" y1="5" x2="12" y2="19" />
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
-                <span className="font-inter font-bold text-[#81191B] text-[11px] sm:text-[12px] md:text-[13px] tracking-wider uppercase mt-2.5 text-center">
-                  FOUNDER PHOTO / VIDEO
-                </span>
+              <div className="relative w-full aspect-[4/3.8] bg-[#E7D5B7] border border-[#81191B]/40 overflow-hidden rounded-[2px]">
+                <Image
+                  src="/founders.jpg"
+                  alt="Meet the flavour makers - Founders of The Laphing Co."
+                  fill
+                  className="object-cover object-[center_30%]"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 465px"
+                />
               </div>
               {/* Caption */}
               <p className="font-inter font-bold text-[#81191B] text-[16px] xs:text-[17px] sm:text-[19px] md:text-[20px] mt-3.5 sm:mt-5 text-left leading-tight">
@@ -966,14 +966,14 @@ export default function Home() {
             {/* Right Polaroid */}
             <div className="relative w-full max-w-[290px] xs:max-w-[330px] sm:max-w-[390px] md:max-w-[440px] lg:max-w-[465px] bg-[#FFF5DB] border-[1.5px] border-[#81191B] rounded-[6px] p-3.5 xs:p-4 sm:p-5 pb-5 sm:pb-7 shadow-[0_12px_28px_rgba(129,25,27,0.12)] transition-transform duration-300 hover:scale-[1.02] cursor-pointer rotate-[1.5deg] md:rotate-[3deg]">
               {/* Photo Area */}
-              <div className="relative w-full aspect-[4/3.8] bg-[#E7D5B7] border border-[#81191B]/40 flex flex-col items-center justify-center p-4">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#81191B" strokeWidth="2.2" strokeLinecap="round">
-                  <line x1="12" y1="5" x2="12" y2="19" />
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
-                <span className="font-inter font-bold text-[#81191B] text-[11px] sm:text-[12px] md:text-[13px] tracking-wider uppercase mt-2.5 text-center">
-                  BEHIND THE SCENES
-                </span>
+              <div className="relative w-full aspect-[4/3.8] bg-[#E7D5B7] border border-[#81191B]/40 overflow-hidden rounded-[2px]">
+                <Image
+                  src="/behind-the-scenes.jpg"
+                  alt="Behind the scenes - A little chaos. A lot of flavour."
+                  fill
+                  className="object-cover object-center"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 465px"
+                />
               </div>
               {/* Caption */}
               <p className="font-inter font-bold text-[#81191B] text-[16px] xs:text-[17px] sm:text-[19px] md:text-[20px] mt-3.5 sm:mt-5 text-left leading-tight">
