@@ -19,6 +19,8 @@ import {
   AlertCircle,
   ShieldCheck,
   Lock,
+  X,
+  Flame,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -68,6 +70,7 @@ export default function CheckoutPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [formError, setFormError] = useState("");
   const [orderSuccess, setOrderSuccess] = useState<OrderSuccessData | null>(null);
+  const [showComingSoonModal, setShowComingSoonModal] = useState(false);
 
   // Product state
   const [productDetails, setProductDetails] = useState({
@@ -163,8 +166,38 @@ export default function CheckoutPage() {
     if (formError) setFormError("");
   };
 
-  // Order click handler -> Integrates Razorpay payment & saves order in Firestore
+  // Order click handler -> Displays "Accepting orders soon" dialog instead of Razorpay
   const handleOrderSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    setFormError("");
+
+    // If customer entered contact details, record their preorder interest lead in Firestore
+    const emailToUse = (formData.email || user?.email || "").trim();
+    const phoneToUse = formData.phone.trim();
+    if (emailToUse || phoneToUse) {
+      try {
+        await addDoc(collection(db, "preorder_leads"), {
+          name: formData.name.trim() || userName || "Anonymous Laphing Fan",
+          email: emailToUse,
+          phone: phoneToUse,
+          address: formData.address.trim(),
+          city: formData.city.trim(),
+          state: formData.state.trim(),
+          pincode: formData.pincode.trim(),
+          quantity,
+          finalTotal,
+          createdAt: new Date(),
+        });
+      } catch (err) {
+        console.warn("Could not record lead:", err);
+      }
+    }
+
+    setShowComingSoonModal(true);
+  };
+
+  // Original Razorpay payment handler (preserved for when live gateway is re-enabled)
+  const handleRazorpayPayment = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     setFormError("");
 
@@ -964,6 +997,85 @@ export default function CheckoutPage() {
           </div>
         </div>
       </main>
+
+      {/* ================= ACCEPTING ORDERS SOON MODAL ================= */}
+      {showComingSoonModal && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md animate-fade-in"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowComingSoonModal(false);
+          }}
+        >
+          <div className="relative w-full max-w-[460px] my-auto bg-[#FFDE59] text-[#741117] rounded-3xl p-6 sm:p-8 shadow-[0_25px_60px_rgba(0,0,0,0.5)] border-3 border-[#81191B] animate-in fade-in zoom-in-95 duration-200">
+            {/* Close Button */}
+            <button
+              onClick={() => setShowComingSoonModal(false)}
+              type="button"
+              aria-label="Close dialog"
+              className="absolute top-4 right-4 sm:top-5 sm:right-5 w-9 h-9 flex items-center justify-center rounded-full bg-[#81191B]/15 hover:bg-[#81191B] text-[#81191B] hover:text-[#FFDE59] transition-all duration-200 cursor-pointer"
+            >
+              <X className="w-5 h-5 stroke-[2.5]" />
+            </button>
+
+            {/* Icon & Content */}
+            <div className="flex flex-col items-center text-center">
+              <div className="w-16 h-16 rounded-2xl bg-[#81191B] text-[#FFDE59] flex items-center justify-center mb-4 shadow-lg rotate-[-3deg]">
+                <Flame className="w-9 h-9 fill-[#FFDE59]" />
+              </div>
+
+              <span className="font-inter font-bold text-[#81191B]/80 text-[12px] sm:text-[13px] tracking-wider uppercase mb-1">
+                A Little Chaos. A Lot of Flavour.
+              </span>
+
+              <h3 className="font-inter font-black text-[#81191B] text-[24px] sm:text-[28px] leading-[1.05] uppercase tracking-tight">
+                We will be accepting orders soon!
+              </h3>
+
+              <p className="font-inter font-medium text-[#741117]/90 text-[14px] sm:text-[15px] mt-3 leading-relaxed">
+                We are currently crafting our first fresh batches of spicy authentic Laphing noodles and setting up express kitchen deliveries.
+              </p>
+
+              {(formData.email || user?.email) ? (
+                <div className="w-full bg-[#FFFBF0] border border-[#81191B]/30 rounded-2xl p-3.5 mt-4 text-left">
+                  <div className="flex items-center gap-2 text-[#81191B] font-bold text-xs uppercase tracking-wide">
+                    <Sparkles className="w-3.5 h-3.5 text-[#81191B]" />
+                    <span>Priority Pre-Order Access</span>
+                  </div>
+                  <p className="text-[13px] text-[#741117] mt-1 font-medium">
+                    We have saved your details! We will notify <strong className="font-bold underline">{(formData.email || user?.email)}</strong> the exact moment orders go live.
+                  </p>
+                </div>
+              ) : (
+                <div className="w-full bg-[#FFFBF0] border border-[#81191B]/30 rounded-2xl p-3.5 mt-4 text-center">
+                  <p className="text-[13px] text-[#741117] font-medium">
+                    Fill in your email on checkout to get notified the second pre-orders open!
+                  </p>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="w-full mt-6 space-y-2.5">
+                <button
+                  type="button"
+                  onClick={() => setShowComingSoonModal(false)}
+                  className="w-full bg-[#81191B] hover:bg-[#681315] text-[#FFDE59] font-inter font-black text-[15px] sm:text-[16px] uppercase tracking-wider py-4 px-6 rounded-2xl shadow-lg transition-transform active:scale-[0.98] cursor-pointer"
+                >
+                  Got It, Can&apos;t Wait! 🔥
+                </button>
+
+                <Link
+                  href="/"
+                  className="inline-block text-xs font-bold text-[#81191B]/80 hover:text-[#81191B] hover:underline transition-colors pt-1"
+                >
+                  Back to Homepage
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Brand Footer */}
       <Footer />
