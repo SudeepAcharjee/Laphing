@@ -1033,27 +1033,7 @@ export default function CheckoutPage() {
                 We will be accepting orders soon!
               </h3>
 
-              <p className="font-inter font-medium text-[#741117]/90 text-[14px] sm:text-[15px] mt-3 leading-relaxed">
-                We are currently crafting our first fresh batches of spicy authentic Laphing noodles and setting up express kitchen deliveries.
-              </p>
 
-              {(formData.email || user?.email) ? (
-                <div className="w-full bg-[#FFFBF0] border border-[#81191B]/30 rounded-2xl p-3.5 mt-4 text-left">
-                  <div className="flex items-center gap-2 text-[#81191B] font-bold text-xs uppercase tracking-wide">
-                    <Sparkles className="w-3.5 h-3.5 text-[#81191B]" />
-                    <span>Priority Pre-Order Access</span>
-                  </div>
-                  <p className="text-[13px] text-[#741117] mt-1 font-medium">
-                    We have saved your details! We will notify <strong className="font-bold underline">{(formData.email || user?.email)}</strong> the exact moment orders go live.
-                  </p>
-                </div>
-              ) : (
-                <div className="w-full bg-[#FFFBF0] border border-[#81191B]/30 rounded-2xl p-3.5 mt-4 text-center">
-                  <p className="text-[13px] text-[#741117] font-medium">
-                    Fill in your email on checkout to get notified the second pre-orders open!
-                  </p>
-                </div>
-              )}
 
               {/* Action Buttons */}
               <div className="w-full mt-6 space-y-2.5">
