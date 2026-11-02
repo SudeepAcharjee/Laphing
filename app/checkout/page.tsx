@@ -1042,7 +1042,7 @@ export default function CheckoutPage() {
                   onClick={() => setShowComingSoonModal(false)}
                   className="w-full bg-[#81191B] hover:bg-[#681315] text-[#FFDE59] font-inter font-black text-[15px] sm:text-[16px] uppercase tracking-wider py-4 px-6 rounded-2xl shadow-lg transition-transform active:scale-[0.98] cursor-pointer"
                 >
-                  Got It, Can&apos;t Wait! 🔥
+                  Got It, Can&apos;t Wait!
                 </button>
 
                 <Link
