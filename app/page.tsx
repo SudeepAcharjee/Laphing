@@ -37,16 +37,22 @@ export default function Home() {
       <section className="relative w-full bg-[#6B1319] select-none border-t border-black/10">
         <div className="w-full max-w-[1440px] mx-auto px-3 sm:px-10 md:px-16 lg:px-20 py-6 sm:py-8 md:py-10 flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6">
           
-          {/* Headline: Prominent Main Heading + Stylized Accent */}
-          <h2 className="flex flex-wrap items-baseline justify-center md:justify-start gap-x-4 sm:gap-x-6 md:gap-x-8 gap-y-1.5 drop-shadow-sm text-center md:text-left">
-            <span className="font-inter font-black text-white text-[22px] min-[360px]:text-[24px] sm:text-[30px] md:text-[36px] lg:text-[40px] xl:text-[44px] tracking-tight uppercase leading-none inline-flex items-baseline gap-x-3 sm:gap-x-4 md:gap-x-5 lg:gap-x-6">
-              <span>CRAVING</span>
-              <span>LAPHING?</span>
-            </span>
-            <span className="font-slackey text-[#FFDE59] text-[18px] min-[360px]:text-[20px] sm:text-[24px] md:text-[27px] lg:text-[30px] xl:text-[32px] tracking-normal uppercase leading-none">
-              WE GET IT.
-            </span>
-          </h2>
+          {/* Headline & Subline Container */}
+          <div className="flex flex-col items-center md:items-start text-center md:text-left">
+            {/* Headline: Prominent Main Heading + Stylized Accent */}
+            <h2 className="flex flex-wrap items-baseline justify-center md:justify-start gap-x-4 sm:gap-x-6 md:gap-x-8 gap-y-1.5 drop-shadow-sm text-center md:text-left">
+              <span className="font-inter font-black text-white text-[22px] min-[360px]:text-[24px] sm:text-[30px] md:text-[36px] lg:text-[40px] xl:text-[44px] tracking-tight uppercase leading-none inline-flex items-baseline gap-x-3 sm:gap-x-4 md:gap-x-5 lg:gap-x-6">
+                <span>CRAVING</span>
+                <span>LAPHING?</span>
+              </span>
+              <span className="font-slackey text-[#FFDE59] text-[18px] min-[360px]:text-[20px] sm:text-[24px] md:text-[27px] lg:text-[30px] xl:text-[32px] tracking-normal uppercase leading-none">
+                WE GET IT.
+              </span>
+            </h2>
+            <p className="font-inter font-medium text-[#FFF5DB]/90 text-[13px] sm:text-[15px] md:text-[16px] mt-2 sm:mt-2.5 tracking-normal">
+              Make spicy, saucey authentic laphing at home in 5 minutes.
+            </p>
+          </div>
 
           {/* Action Button */}
           <button
