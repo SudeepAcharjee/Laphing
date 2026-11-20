@@ -19,12 +19,50 @@ import {
   AlertCircle,
   ShieldCheck,
   Lock,
-  X,
-  Flame,
+  ChevronDown,
+  Send,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/context/AuthContext";
+
+const INDIAN_STATES = [
+  "Delhi",
+  "Andhra Pradesh",
+  "Arunachal Pradesh",
+  "Assam",
+  "Bihar",
+  "Chandigarh",
+  "Chhattisgarh",
+  "Dadra and Nagar Haveli and Daman and Diu",
+  "Goa",
+  "Gujarat",
+  "Haryana",
+  "Himachal Pradesh",
+  "Jammu and Kashmir",
+  "Jharkhand",
+  "Karnataka",
+  "Kerala",
+  "Ladakh",
+  "Lakshadweep",
+  "Madhya Pradesh",
+  "Maharashtra",
+  "Manipur",
+  "Meghalaya",
+  "Mizoram",
+  "Nagaland",
+  "Odisha",
+  "Puducherry",
+  "Punjab",
+  "Rajasthan",
+  "Sikkim",
+  "Tamil Nadu",
+  "Telangana",
+  "Tripura",
+  "Uttar Pradesh",
+  "Uttarakhand",
+  "West Bengal",
+];
 
 const loadRazorpayScript = (): Promise<boolean> => {
   return new Promise((resolve) => {
@@ -58,6 +96,19 @@ interface OrderSuccessData {
   address: string;
 }
 
+interface OutsideDelhiSuccessData {
+  id: string;
+  customerName: string;
+  email: string;
+  phone: string;
+  city: string;
+  state: string;
+  address: string;
+  totalAmount: number;
+  quantity: number;
+  productName: string;
+}
+
 export default function CheckoutPage() {
   const { openAuthModal } = useAuth();
   const [loading, setLoading] = useState(true);
@@ -70,7 +121,7 @@ export default function CheckoutPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [formError, setFormError] = useState("");
   const [orderSuccess, setOrderSuccess] = useState<OrderSuccessData | null>(null);
-  const [showComingSoonModal, setShowComingSoonModal] = useState(false);
+  const [outsideDelhiSuccess, setOutsideDelhiSuccess] = useState<OutsideDelhiSuccessData | null>(null);
 
   // Product state
   const [productDetails, setProductDetails] = useState({
@@ -80,16 +131,20 @@ export default function CheckoutPage() {
     imageUrl: "/pack.png",
   });
 
-  // Form state
+  // Form state - Default to Delhi as primary delivery zone
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
     address: "",
-    city: "",
-    state: "",
+    city: "New Delhi",
+    state: "Delhi",
     pincode: "",
   });
+
+  // Check if state is in Delhi delivery zone
+  const isDelhi =
+    formData.state?.trim().toLowerCase().includes("delhi");
 
   // Pricing calculations
   const unitPrice = productDetails.price;
@@ -141,6 +196,9 @@ export default function CheckoutPage() {
               email: data.email || currentUser.email || prev.email,
               phone: data.phone || prev.phone,
               address: data.address || prev.address,
+              city: data.city || prev.city || "New Delhi",
+              state: data.state || prev.state || "Delhi",
+              pincode: data.pincode || prev.pincode,
             }));
           } else {
             setFormData((prev) => ({
@@ -160,78 +218,16 @@ export default function CheckoutPage() {
   }, []);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     if (formError) setFormError("");
   };
 
-  // Order click handler -> Displays "Accepting orders soon" dialog instead of Razorpay
-  const handleOrderSubmit = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    setFormError("");
-
-    // If customer entered contact details, record their preorder interest lead in Firestore
-    const emailToUse = (formData.email || user?.email || "").trim();
-    const phoneToUse = formData.phone.trim();
-    if (emailToUse || phoneToUse) {
-      try {
-        await addDoc(collection(db, "preorder_leads"), {
-          name: formData.name.trim() || userName || "Anonymous Laphing Fan",
-          email: emailToUse,
-          phone: phoneToUse,
-          address: formData.address.trim(),
-          city: formData.city.trim(),
-          state: formData.state.trim(),
-          pincode: formData.pincode.trim(),
-          quantity,
-          finalTotal,
-          createdAt: new Date(),
-        });
-      } catch (err) {
-        console.warn("Could not record lead:", err);
-      }
-    }
-
-    setShowComingSoonModal(true);
-  };
-
-  // Original Razorpay payment handler (preserved for when live gateway is re-enabled)
-  const handleRazorpayPayment = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    setFormError("");
-
-    // Validate inputs
-    if (!formData.name.trim()) {
-      setFormError("Please enter your full name.");
-      return;
-    }
-    if (!formData.phone.trim() || formData.phone.trim().length < 10) {
-      setFormError("Please enter a valid 10-digit phone number for delivery.");
-      return;
-    }
-    const emailToUse = (formData.email || user?.email || "").trim();
-    if (!emailToUse || !emailToUse.includes("@")) {
-      setFormError("Please enter a valid email address for your order confirmation.");
-      return;
-    }
-    if (!formData.address.trim()) {
-      setFormError("Please enter your complete street address.");
-      return;
-    }
-    if (!formData.city.trim()) {
-      setFormError("Please enter your city.");
-      return;
-    }
-    if (!formData.state.trim()) {
-      setFormError("Please enter your state.");
-      return;
-    }
-    if (!formData.pincode.trim() || formData.pincode.trim().length < 6) {
-      setFormError("Please enter a valid 6-digit PIN code.");
-      return;
-    }
-
+  // ===================================================================
+  // 1. RAZORPAY PAYMENT (For Delhi Customers)
+  // ===================================================================
+  const handleRazorpayPayment = async (emailToUse: string) => {
     setIsProcessing(true);
 
     try {
@@ -257,7 +253,7 @@ export default function CheckoutPage() {
 
       // 3. Open Razorpay Checkout modal
       const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_live_TtimsQbeGWPL99",
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_U26ozDO31GgoJ3",
         amount: orderData.amount,
         currency: orderData.currency || "INR",
         name: "de Laphing co.",
@@ -329,6 +325,7 @@ export default function CheckoutPage() {
               status: "Processing",
               razorpayOrderId: paymentResponse.razorpay_order_id,
               razorpayPaymentId: paymentResponse.razorpay_payment_id,
+              isDelhiOrder: true,
               createdAt: new Date(),
             };
 
@@ -401,15 +398,189 @@ export default function CheckoutPage() {
       });
       razorpay.open();
     } catch (err: any) {
-      console.error("Order flow error:", err);
+      console.error("Razorpay flow error:", err);
       setFormError(
-        err.message || "An unexpected error occurred. Please try again."
+        err.message || "An unexpected error occurred during payment. Please try again."
       );
       setIsProcessing(false);
     }
   };
 
-  // Instant Test Order simulation (helpful while setting up or renewing Razorpay keys)
+  // ===================================================================
+  // 2. OUTSIDE DELHI ORDER REQUEST (NO PAYMENT TAKEN)
+  // ===================================================================
+  const handleOutsideDelhiRequest = async (emailToUse: string) => {
+    setIsProcessing(true);
+
+    try {
+      const orderPayload = {
+        userId: user?.uid || null,
+        customerDetails: {
+          name: formData.name.trim(),
+          email: emailToUse.toLowerCase(),
+          phone: formData.phone.trim(),
+          address: formData.address.trim(),
+          city: formData.city.trim(),
+          state: formData.state.trim(),
+          pincode: formData.pincode.trim(),
+        },
+        items: [
+          {
+            name: productDetails.name,
+            quantity: quantity,
+            unitPrice: unitPrice,
+            totalPrice: basePrice,
+          },
+        ],
+        quantity: quantity,
+        unitPrice: unitPrice,
+        basePrice: basePrice,
+        discountPercent: discountPercent,
+        discountApplied: discountAmount,
+        totalAmount: finalTotal,
+        status: "Order Request (Outside Delhi)",
+        razorpayOrderId: "OUTSIDE_DELHI_REQUEST",
+        razorpayPaymentId: "REQUEST_ONLY",
+        isOutsideDelhi: true,
+        createdAt: new Date(),
+      };
+
+      // 1. Save to orders collection so it is visible in Admin Orders and User Dashboard
+      const docRef = await addDoc(collection(db, "orders"), orderPayload);
+
+      // 2. Also record in preorder_leads for waitlist tracking
+      try {
+        await addDoc(collection(db, "preorder_leads"), {
+          name: formData.name.trim() || userName || "Laphing Customer",
+          email: emailToUse.toLowerCase(),
+          phone: formData.phone.trim(),
+          address: formData.address.trim(),
+          city: formData.city.trim(),
+          state: formData.state.trim(),
+          pincode: formData.pincode.trim(),
+          quantity,
+          finalTotal,
+          source: "outside_delhi_order_request",
+          createdAt: new Date(),
+        });
+      } catch (err) {
+        console.warn("Non-blocking lead save notice:", err);
+      }
+
+      // 3. Also record in signups collection for admin table
+      try {
+        await addDoc(collection(db, "signups"), {
+          name: formData.name.trim(),
+          email: emailToUse.toLowerCase(),
+          phone: formData.phone.trim(),
+          address: `${formData.address.trim()}, ${formData.city.trim()}, ${formData.state.trim()} - ${formData.pincode.trim()}`,
+          consent: true,
+          createdAt: new Date(),
+        });
+      } catch (err) {
+        console.warn("Non-blocking signups notice:", err);
+      }
+
+      // 4. Update user profile if authenticated
+      if (user?.uid) {
+        try {
+          await updateDoc(doc(db, "users", user.uid), {
+            phone: formData.phone.trim(),
+            address: `${formData.address.trim()}, ${formData.city.trim()}, ${formData.state.trim()} - ${formData.pincode.trim()}`,
+          });
+        } catch (profileErr) {
+          console.warn("Could not save address to user document:", profileErr);
+        }
+      }
+
+      // 5. Send automated confirmation email to customer
+      try {
+        fetch("/api/send-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            to: emailToUse.toLowerCase(),
+            type: "order_status",
+            orderId: docRef.id,
+            name: formData.name.trim(),
+            newStatus: `Order Request Received (Waitlist - ${formData.city})`,
+          }),
+        }).catch((e) => console.warn("Background email notification error:", e));
+      } catch (e) {
+        console.warn("Email notice:", e);
+      }
+
+      // 6. Display the Outside Delhi Order Request Placed screen
+      setOutsideDelhiSuccess({
+        id: docRef.id,
+        customerName: formData.name.trim(),
+        email: emailToUse.toLowerCase(),
+        phone: formData.phone.trim(),
+        city: formData.city.trim(),
+        state: formData.state.trim(),
+        address: `${formData.address.trim()}, ${formData.city.trim()}, ${formData.state.trim()} - ${formData.pincode.trim()}`,
+        totalAmount: finalTotal,
+        quantity,
+        productName: productDetails.name,
+      });
+    } catch (err: any) {
+      console.error("Outside Delhi request error:", err);
+      setFormError(
+        err.message || "Failed to submit order request. Please try again."
+      );
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  // ===================================================================
+  // 3. MAIN FORM SUBMISSION ROUTER
+  // ===================================================================
+  const handleOrderSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    setFormError("");
+
+    // Validate inputs
+    if (!formData.name.trim()) {
+      setFormError("Please enter your full name.");
+      return;
+    }
+    if (!formData.phone.trim() || formData.phone.trim().length < 10) {
+      setFormError("Please enter a valid 10-digit phone number for delivery.");
+      return;
+    }
+    const emailToUse = (formData.email || user?.email || "").trim();
+    if (!emailToUse || !emailToUse.includes("@")) {
+      setFormError("Please enter a valid email address for your order confirmation.");
+      return;
+    }
+    if (!formData.address.trim()) {
+      setFormError("Please enter your complete street address.");
+      return;
+    }
+    if (!formData.city.trim()) {
+      setFormError("Please enter your city.");
+      return;
+    }
+    if (!formData.state.trim()) {
+      setFormError("Please select your state from the dropdown.");
+      return;
+    }
+    if (!formData.pincode.trim() || formData.pincode.trim().length < 6) {
+      setFormError("Please enter a valid 6-digit PIN code.");
+      return;
+    }
+
+    if (isDelhi) {
+      // In Delhi -> Pay with Razorpay
+      await handleRazorpayPayment(emailToUse);
+    } else {
+      // Outside Delhi -> Do NOT take payment, only take order request
+      await handleOutsideDelhiRequest(emailToUse);
+    }
+  };
+
+  // Instant Test Order simulation (for dev/testing fallback)
   const handleTestOrderSubmit = async () => {
     setFormError("");
 
@@ -435,7 +606,7 @@ export default function CheckoutPage() {
       return;
     }
     if (!formData.state.trim()) {
-      setFormError("Please enter your state.");
+      setFormError("Please select your state from the dropdown.");
       return;
     }
     if (!formData.pincode.trim() || formData.pincode.trim().length < 6) {
@@ -482,7 +653,7 @@ export default function CheckoutPage() {
         discountPercent: discountPercent,
         discountApplied: discountAmount,
         totalAmount: finalTotal,
-        status: "Processing",
+        status: isDelhi ? "Processing" : "Order Request (Outside Delhi)",
         razorpayOrderId: mockOrderId,
         razorpayPaymentId: mockPaymentId,
         createdAt: new Date(),
@@ -543,7 +714,97 @@ export default function CheckoutPage() {
   };
 
   // ===================================================================
-  // ORDER CONFIRMATION / SUCCESS VIEW
+  // VIEW A: OUTSIDE DELHI ORDER REQUEST CONFIRMATION VIEW
+  // ===================================================================
+  if (outsideDelhiSuccess) {
+    return (
+      <div className="min-h-screen w-full bg-[#741117] text-white flex flex-col justify-between select-none">
+        <Navbar />
+
+        <main className="w-full max-w-[800px] mx-auto px-4 sm:px-6 py-12 flex-1 flex items-center justify-center">
+          <div className="w-full bg-[#401316] border-2 border-[#81191B] rounded-3xl p-6 sm:p-10 shadow-2xl text-center space-y-6 animate-fade-in">
+            {/* MapPin / City Icon Badge */}
+            <div className="w-20 h-20 mx-auto rounded-3xl bg-[#FFDE59] text-[#741117] flex items-center justify-center shadow-xl ring-8 ring-[#FFDE59]/20">
+              <MapPin className="w-12 h-12" />
+            </div>
+
+            <div>
+              <span className="inline-block text-xs font-bold text-[#FFDE59] uppercase tracking-widest bg-[#FFDE59]/15 border border-[#FFDE59]/30 px-3.5 py-1 rounded-full mb-3">
+                Order Request Recorded • Delhi Only Delivery
+              </span>
+              <h1 className="font-inter font-black text-white text-3xl sm:text-4xl uppercase tracking-tight">
+                Order Request Placed!
+              </h1>
+              <p className="text-white/80 text-sm sm:text-base mt-2 max-w-lg mx-auto leading-relaxed">
+                Thank you, <strong className="text-white">{outsideDelhiSuccess.customerName}</strong>! We are currently delivering fresh batches exclusively in <strong className="text-[#FFDE59]">Delhi</strong>. No payment has been charged.
+              </p>
+            </div>
+
+            {/* Request Summary Card */}
+            <div className="bg-[#2D0D10] border border-[#81191B] rounded-2xl p-5 sm:p-6 text-left space-y-3.5 text-sm">
+              <div className="flex justify-between items-center pb-3 border-b border-[#81191B]/60">
+                <span className="text-white/60">Request Reference</span>
+                <span className="font-mono font-bold text-[#FFDE59] text-base">
+                  #{outsideDelhiSuccess.id.slice(0, 8).toUpperCase()}
+                </span>
+              </div>
+              <div className="flex justify-between items-center pb-3 border-b border-[#81191B]/60">
+                <span className="text-white/60">Destination</span>
+                <span className="font-bold text-white">
+                  {outsideDelhiSuccess.city}, {outsideDelhiSuccess.state}
+                </span>
+              </div>
+              <div className="flex justify-between items-center pb-3 border-b border-[#81191B]/60">
+                <span className="text-white/60">Items Requested</span>
+                <span className="font-bold text-white">
+                  {outsideDelhiSuccess.quantity}x {outsideDelhiSuccess.productName}
+                </span>
+              </div>
+              <div className="flex justify-between items-center pb-3 border-b border-[#81191B]/60">
+                <span className="text-white/60">Estimated Total</span>
+                <span className="font-black text-[#FFDE59]">
+                  ₹{outsideDelhiSuccess.totalAmount} (Pay upon dispatch)
+                </span>
+              </div>
+              <div className="flex justify-between items-center pt-1 text-sm">
+                <span className="text-white/60">Status</span>
+                <span className="font-bold text-yellow-300 bg-yellow-500/20 border border-yellow-500/30 px-3 py-1 rounded-full text-xs">
+                  Priority Waitlist (Outside Delhi)
+                </span>
+              </div>
+            </div>
+
+            {/* Explanation Note */}
+            <div className="bg-[#540B10] border border-[#FFDE59]/25 rounded-2xl p-4 sm:p-5 text-xs sm:text-sm text-white/90 text-center leading-relaxed">
+              📍 Because our Tibetan cold laphing kits are freshly made and temperature-controlled, our dispatch network is currently active only in <strong>Delhi</strong>. We have logged your request and will notify you at <strong className="text-[#FFDE59]">{outsideDelhiSuccess.email}</strong> the moment delivery expands to <strong>{outsideDelhiSuccess.state}</strong>!
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3.5 justify-center pt-2">
+              <Link
+                href="/dashboard"
+                className="bg-[#FFDE59] hover:bg-[#FFE58A] text-[#741117] font-inter font-black text-sm uppercase tracking-wider py-3.5 px-7 rounded-xl shadow-lg transition-all hover:scale-[1.02] active:scale-95 text-center flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Package className="w-4 h-4" />
+                <span>View in My Orders</span>
+              </Link>
+              <Link
+                href="/"
+                className="bg-transparent hover:bg-white/5 border border-white/20 text-white font-inter font-bold text-sm uppercase tracking-wider py-3.5 px-6 rounded-xl transition-all text-center flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <span>Back to Homepage</span>
+              </Link>
+            </div>
+          </div>
+        </main>
+
+        <Footer />
+      </div>
+    );
+  }
+
+  // ===================================================================
+  // VIEW B: DELHI PAYMENT SUCCESS & ORDER CONFIRMATION VIEW
   // ===================================================================
   if (orderSuccess) {
     return (
@@ -559,7 +820,7 @@ export default function CheckoutPage() {
 
             <div>
               <span className="inline-block text-xs font-bold text-[#FFDE59] uppercase tracking-widest bg-[#FFDE59]/15 border border-[#FFDE59]/30 px-3.5 py-1 rounded-full mb-3">
-                Payment Confirmed & Verified
+                Payment Confirmed & Verified • Delhi Delivery
               </span>
               <h1 className="font-inter font-black text-white text-3xl sm:text-4xl uppercase tracking-tight">
                 Order Placed Successfully!
@@ -634,7 +895,7 @@ export default function CheckoutPage() {
   }
 
   // ===================================================================
-  // MAIN CHECKOUT FORM VIEW
+  // VIEW C: MAIN CHECKOUT FORM VIEW
   // ===================================================================
   return (
     <div className="min-h-screen w-full bg-[#741117] text-white flex flex-col justify-between select-none">
@@ -652,7 +913,7 @@ export default function CheckoutPage() {
               <div className="flex items-center gap-2 mb-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#FFDE59] animate-pulse" />
                 <span className="font-inter font-bold text-[#FFDE59] text-[12px] uppercase tracking-wider">
-                  Secure Checkout
+                  {isDelhi ? "Live Delivery Active in Delhi" : "Delhi Delivery Active • Outside Delhi Order Request"}
                 </span>
               </div>
 
@@ -685,7 +946,7 @@ export default function CheckoutPage() {
                 {formError.toLowerCase().includes("authentication") && (
                   <div className="bg-[#2D0A0D] border border-red-500/30 p-3.5 rounded-xl text-xs space-y-2 mt-1">
                     <p className="text-yellow-100/90 font-normal leading-relaxed">
-                      💡 <strong>Notice:</strong> The Razorpay test keys currently configured in <code className="bg-black/40 px-1.5 py-0.5 rounded font-mono text-yellow-300">.env.local</code> returned an Authentication Failed response from Razorpay. You can update them in <code className="bg-black/40 px-1.5 py-0.5 rounded font-mono text-yellow-300">.env.local</code> with active keys from your Razorpay Dashboard.
+                      💡 <strong>Notice:</strong> Razorpay returned an authentication error. You can verify your credentials in <code className="bg-black/40 px-1.5 py-0.5 rounded font-mono text-yellow-300">.env.local</code>.
                     </p>
                     <button
                       type="button"
@@ -783,6 +1044,7 @@ export default function CheckoutPage() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {/* City */}
                   <div>
                     <label className="text-[12px] font-bold uppercase tracking-wider text-white/70 block mb-1">
                       City <span className="text-[#FFDE59]">*</span>
@@ -791,28 +1053,43 @@ export default function CheckoutPage() {
                       type="text"
                       name="city"
                       required
-                      placeholder="City"
+                      placeholder="e.g. New Delhi"
                       value={formData.city}
                       onChange={handleChange}
                       className="w-full bg-[#2C0A0E] border border-[#81191B] focus:border-[#FFDE59] rounded-xl py-3 px-3.5 text-[15px] text-white placeholder-white/40 outline-none transition-all"
                     />
                   </div>
 
+                  {/* State Dropdown */}
                   <div>
                     <label className="text-[12px] font-bold uppercase tracking-wider text-white/70 block mb-1">
                       State <span className="text-[#FFDE59]">*</span>
                     </label>
-                    <input
-                      type="text"
-                      name="state"
-                      required
-                      placeholder="State"
-                      value={formData.state}
-                      onChange={handleChange}
-                      className="w-full bg-[#2C0A0E] border border-[#81191B] focus:border-[#FFDE59] rounded-xl py-3 px-3.5 text-[15px] text-white placeholder-white/40 outline-none transition-all"
-                    />
+                    <div className="relative">
+                      <select
+                        name="state"
+                        required
+                        value={formData.state}
+                        onChange={handleChange}
+                        className="w-full bg-[#2C0A0E] border border-[#81191B] focus:border-[#FFDE59] rounded-xl py-3 pl-3.5 pr-8 text-[15px] text-white outline-none transition-all cursor-pointer appearance-none font-medium"
+                      >
+                        <option value="" disabled className="bg-[#2C0A0E] text-white/40">
+                          Select State
+                        </option>
+                        <option value="Delhi" className="bg-[#2C0A0E] text-[#FFDE59] font-bold">
+                          Delhi (Delivery Active 🚀)
+                        </option>
+                        {INDIAN_STATES.filter((s) => s !== "Delhi").map((st) => (
+                          <option key={st} value={st} className="bg-[#2C0A0E] text-white">
+                            {st}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/50 pointer-events-none" />
+                    </div>
                   </div>
 
+                  {/* PIN Code */}
                   <div>
                     <label className="text-[12px] font-bold uppercase tracking-wider text-white/70 block mb-1">
                       PIN Code <span className="text-[#FFDE59]">*</span>
@@ -829,6 +1106,21 @@ export default function CheckoutPage() {
                     />
                   </div>
                 </div>
+
+                {/* Outside Delhi Info Banner */}
+                {!isDelhi && formData.state && (
+                  <div className="mt-3 bg-[#FFDE59]/10 border border-[#FFDE59]/30 rounded-2xl p-4 text-xs sm:text-sm text-[#FFDE59] flex items-start gap-3 animate-fade-in">
+                    <MapPin className="w-5 h-5 text-[#FFDE59] shrink-0 mt-0.5" />
+                    <div className="space-y-1 leading-relaxed">
+                      <p className="font-bold text-white text-[13px]">
+                        Currently delivering exclusively in Delhi
+                      </p>
+                      <p className="text-white/80">
+                        Since your delivery address is in <strong>{formData.state}</strong>, you can submit an <strong>Order Request</strong> below without any payment. We will prioritize your city and notify you immediately upon launch!
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Order Submit Button */}
@@ -837,37 +1129,50 @@ export default function CheckoutPage() {
                   type="submit"
                   id="checkout-order-btn"
                   disabled={isProcessing}
-                  className="w-full bg-[#FFDE59] hover:bg-[#FFE58A] disabled:opacity-50 text-[#741117] font-inter font-black text-[16px] sm:text-[18px] uppercase tracking-wider py-4 rounded-2xl shadow-xl transition-all duration-200 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-3 cursor-pointer disabled:cursor-not-allowed"
+                  className="w-full bg-[#FFDE59] hover:bg-[#FFE58A] disabled:opacity-50 text-[#741117] font-inter font-black text-[15px] sm:text-[18px] uppercase tracking-wider py-4 rounded-2xl shadow-xl transition-all duration-200 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-3 cursor-pointer disabled:cursor-not-allowed"
                 >
                   {isProcessing ? (
                     <>
                       <Loader2 className="w-5 h-5 animate-spin" />
-                      <span>Processing Payment...</span>
+                      <span>{isDelhi ? "Connecting to Razorpay..." : "Recording Order Request..."}</span>
                     </>
-                  ) : (
+                  ) : isDelhi ? (
                     <>
                       <Lock className="w-5 h-5" />
                       <span>Pay Now • ₹{finalTotal}</span>
                       <ArrowRight className="w-5 h-5 stroke-[2.5]" />
                     </>
+                  ) : (
+                    <>
+                      <Send className="w-5 h-5 text-[#741117]" />
+                      <span>Place Order Request (No Payment Charged)</span>
+                      <ArrowRight className="w-5 h-5 stroke-[2.5]" />
+                    </>
                   )}
                 </button>
 
-                {/* Trust & Security Badge */}
-                <div className="flex items-center justify-center gap-2 text-white/60 text-xs text-center pt-1">
-                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                  <span>100% Encrypted & Secure Payment via Razorpay (UPI, Cards, NetBanking)</span>
-                </div>
+                {/* Trust & Location Guidance Badge */}
+                {isDelhi ? (
+                  <div className="flex items-center justify-center gap-2 text-white/60 text-xs text-center pt-1">
+                    <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                    <span>100% Encrypted & Secure Payment via Razorpay (Delivering in Delhi)</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center gap-2 text-[#FFDE59]/80 text-xs text-center pt-1">
+                    <MapPin className="w-4 h-4 text-[#FFDE59]" />
+                    <span>No payment required for addresses outside Delhi. We will contact you upon dispatch.</span>
+                  </div>
+                )}
 
-                {/* Instant Test Mode Fallback */}
+                {/* Instant Test Mode Fallback (Dev/Testing only) */}
                 <div className="text-center pt-1">
                   <button
                     type="button"
                     onClick={handleTestOrderSubmit}
                     disabled={isProcessing}
-                    className="text-[11px] text-white/40 hover:text-[#FFDE59] transition-colors underline cursor-pointer"
+                    className="text-[11px] text-white/35 hover:text-[#FFDE59] transition-colors underline cursor-pointer"
                   >
-                    Place instant test order without payment gateway
+                    Place instant test order without payment gateway (Dev simulation)
                   </button>
                 </div>
               </div>
@@ -944,6 +1249,21 @@ export default function CheckoutPage() {
               </div>
             </div>
 
+            {/* Delivery Zone Notice in Summary */}
+            <div className="bg-[#401316] border border-[#81191B] rounded-2xl p-3.5 flex items-center gap-3 text-xs">
+              <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${isDelhi ? "bg-emerald-400 animate-pulse" : "bg-[#FFDE59]"}`} />
+              <div className="leading-snug">
+                <p className="font-bold text-white">
+                  {isDelhi ? "Delivering in Delhi (Live Delivery)" : `Outside Delhi: ${formData.state || "Not Selected"}`}
+                </p>
+                <p className="text-white/60 text-[11px] mt-0.5">
+                  {isDelhi
+                    ? "Express cold-pack delivery directly to your door."
+                    : "No payment charged today. Order request recorded for priority dispatch."}
+                </p>
+              </div>
+            </div>
+
             {/* Price Breakdown */}
             <div className="border-t border-[#81191B]/60 pt-5 space-y-3.5">
               <div className="flex justify-between text-white/75 text-[14px]">
@@ -984,9 +1304,11 @@ export default function CheckoutPage() {
             <div className="border-t border-[#81191B]/60 pt-5 flex justify-between items-baseline">
               <div>
                 <span className="text-white font-inter font-black text-lg block">
-                  Total Payable
+                  {isDelhi ? "Total Payable" : "Estimated Total"}
                 </span>
-                <span className="text-white/50 text-[11px]">Includes all taxes</span>
+                <span className="text-white/50 text-[11px]">
+                  {isDelhi ? "Includes all taxes" : "Pay only when active"}
+                </span>
               </div>
               <div className="text-right">
                 <span className="font-inter font-black text-3xl sm:text-4xl text-[#FFDE59]">
@@ -997,57 +1319,6 @@ export default function CheckoutPage() {
           </div>
         </div>
       </main>
-
-      {/* ================= ACCEPTING ORDERS SOON MODAL ================= */}
-      {showComingSoonModal && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md animate-fade-in"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setShowComingSoonModal(false);
-          }}
-        >
-          <div className="relative w-full max-w-[460px] my-auto bg-[#FFDE59] text-[#741117] rounded-3xl p-6 sm:p-8 shadow-[0_25px_60px_rgba(0,0,0,0.5)] border-3 border-[#81191B] animate-in fade-in zoom-in-95 duration-200">
-            {/* Close Button */}
-            <button
-              onClick={() => setShowComingSoonModal(false)}
-              type="button"
-              aria-label="Close dialog"
-              className="absolute top-4 right-4 sm:top-5 sm:right-5 w-9 h-9 flex items-center justify-center rounded-full bg-[#81191B]/15 hover:bg-[#81191B] text-[#81191B] hover:text-[#FFDE59] transition-all duration-200 cursor-pointer"
-            >
-              <X className="w-5 h-5 stroke-[2.5]" />
-            </button>
-
-            {/* Icon & Content */}
-            <div className="flex flex-col items-center text-center">
-              <div className="w-16 h-16 rounded-2xl bg-[#81191B] text-[#FFDE59] flex items-center justify-center mb-4 shadow-lg rotate-[-3deg]">
-                <Flame className="w-9 h-9 fill-[#FFDE59]" />
-              </div>
-
-              <span className="font-inter font-bold text-[#81191B]/80 text-[12px] sm:text-[13px] tracking-wider uppercase mb-1">
-                A Little Chaos. A Lot of Flavour.
-              </span>
-
-              <h3 className="font-inter font-black text-[#81191B] text-[24px] sm:text-[28px] leading-[1.05] uppercase tracking-tight">
-                We will be accepting orders soon!
-              </h3>
-
-
-
-              {/* Action Buttons */}
-              <div className="w-full mt-6 space-y-2.5">
-                <Link
-                  href="/"
-                  className="inline-block text-xs font-bold text-[#81191B]/80 hover:text-[#81191B] hover:underline transition-colors pt-1"
-                >
-                  Back to Homepage
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Brand Footer */}
       <Footer />
